@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Link } from 'react-router-dom';
+import eVault_Logo from '../../public/eVaultLogoWithBG.png';
 
 const Header = () => {
     const [isScrolled, setIsScrolled] = useState(false);
@@ -20,22 +22,15 @@ const Header = () => {
         <>
             <header
                 className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled
-                        ? 'glass-panel py-3 shadow-lg'
-                        : 'bg-transparent py-5'
+                    ? 'glass-panel py-4 shadow-lg'
+                    : 'bg-transparent py-5'
                     }`}
             >
                 <div className="container mx-auto px-6 h-16 flex items-center justify-between">
                     {/* Logo */}
-                    <a href="#" className="flex items-center gap-2 group">
-                        {/* Animated Gold Logo Container */}
-                        <div className="w-10 h-10 rounded-xl bg-gradient-gold flex items-center justify-center text-white font-black text-xl shadow-lg shadow-gold/30 group-hover:scale-105 transition-transform duration-300">
-                            E
-                        </div>
-                        <div className="text-2xl font-black tracking-tighter text-gray-900">
-                            VAULT
-                            <span className="text-gold">.</span>
-                        </div>
-                    </a>
+                    <div>
+                        <img className='w-35 h-20' src={eVault_Logo} alt="eVault_Logo" />
+                    </div>
 
                     {/* Desktop Nav - Centered */}
                     <nav className="hidden md:flex items-center gap-10 absolute left-1/2 -translate-x-1/2">
@@ -50,11 +45,18 @@ const Header = () => {
                         ))}
                     </nav>
 
-                    {/* CTA Button */}
-                    <div className="hidden md:block">
-                        <button className="bg-[#0F172A] hover:bg-gold hover:text-white text-white font-bold py-2.5 px-6 rounded-lg transition-all shadow-xl shadow-gold/10 hover:shadow-gold/30 border border-white/10 hover:border-gold/50">
-                            Get Started
-                        </button>
+                    {/* Auth Buttons */}
+                    <div className="hidden md:flex items-center gap-3">
+                        <Link to="/login">
+                            <button className="text-navy font-bold py-2.5 px-6 rounded-lg hover:text-gold transition-all">
+                                Login
+                            </button>
+                        </Link>
+                        <Link to="/register">
+                            <button className="bg-gradient-to-r from-navy to-navy-light hover:from-gold hover:to-gold-dark text-black border font-bold py-2.5 px-6 rounded-lg transition-all shadow-lg shadow-navy/20 hover:shadow-gold/30">
+                                Sign Up
+                            </button>
+                        </Link>
                     </div>
 
                     {/* Mobile Menu Toggle */}
@@ -88,9 +90,18 @@ const Header = () => {
                                 </a>
                             ))}
                             <hr className="border-gray-100" />
-                            <button className="bg-gradient-gold text-white font-bold py-4 rounded-lg w-full shadow-lg shadow-gold/30">
-                                Get Started
-                            </button>
+                            <div className="flex flex-col gap-3">
+                                <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>
+                                    <button className="border-2 border-navy text-navy font-bold py-4 rounded-lg w-full hover:bg-navy hover:text-white transition-all">
+                                        Login
+                                    </button>
+                                </Link>
+                                <Link to="/register" onClick={() => setIsMobileMenuOpen(false)}>
+                                    <button className="bg-gradient-to-r from-navy to-navy-light text-white font-bold py-4 rounded-lg w-full shadow-lg shadow-navy/30">
+                                        Sign Up
+                                    </button>
+                                </Link>
+                            </div>
                         </div>
                     </motion.div>
                 )}

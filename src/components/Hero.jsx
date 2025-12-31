@@ -61,7 +61,7 @@ const Hero = () => {
     }, []);
 
     return (
-        <section className="relative pt-32 pb-20 md:pt-22 md:min-h-screen flex items-center overflow-hidden bg-[#FAFAF9]">
+        <section className="relative pt-32 pb-20 md:pt-28 md:min-h-screen flex items-center overflow-hidden bg-[#FAFAF9]">
             {/* Background Gradients - Gold Enhanced */}
             <div className="absolute top-0 right-0 w-[60%] h-full bg-gradient-to-l from-gold/5 to-transparent pointer-events-none" />
             <div className="absolute bottom-0 left-0 w-[50%] h-[50%] bg-gradient-to-t from-gold/10 to-transparent pointer-events-none" />
