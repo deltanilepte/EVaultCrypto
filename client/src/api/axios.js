@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'e-vault-crypto-backend.vercel.app/api',
+    baseURL: 'https://e-vault-crypto-backend.vercel.app/api',
     headers: {
         'Content-Type': 'application/json',
     },
