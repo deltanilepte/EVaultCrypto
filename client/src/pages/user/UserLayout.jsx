@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, Outlet, useLocation } from 'react-router-dom';
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
     HomeIcon,
     CurrencyDollarIcon,
@@ -17,7 +17,8 @@ import eVault_Logo from '../../../public/eVaultLogoWithBG2.png';
 const UserLayout = () => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const location = useLocation();
-    const { user } = useCrypto();
+    const navigate = useNavigate();
+    const { user, logout } = useCrypto();
 
     const navigation = [
         { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
@@ -27,6 +28,11 @@ const UserLayout = () => {
     ];
 
     const isActive = (path) => location.pathname === path;
+
+    const handleLogout = () => {
+        logout();
+        navigate('/login');
+    };
 
     return (
         <div className="min-h-screen bg-gray-50/50 font-sans text-gray-900">
@@ -39,10 +45,9 @@ const UserLayout = () => {
             )}
 
             {/* Sidebar Navigation */}
-            <aside 
-                className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-100 shadow-2xl md:shadow-none transform transition-transform duration-300 ease-in-out ${
-                    sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-                } md:translate-x-0 flex flex-col`}
+            <aside
+                className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-100 shadow-2xl md:shadow-none transform transition-transform duration-300 ease-in-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+                    } md:translate-x-0 flex flex-col`}
             >
                 {/* Logo Area */}
                 <div className="h-36 flex items-center justify-between px-8 border-b border-gray-50">
@@ -62,19 +67,17 @@ const UserLayout = () => {
                                 key={item.name}
                                 to={item.href}
                                 onClick={() => setSidebarOpen(false)}
-                                className={`group flex items-center px-4 py-3.5 text-sm font-medium rounded-xl transition-all duration-200 relative overflow-hidden ${
-                                    active
+                                className={`group flex items-center px-4 py-3.5 text-sm font-medium rounded-xl transition-all duration-200 relative overflow-hidden ${active
                                         ? 'bg-gray-900 text-white shadow-lg shadow-gray-200'
                                         : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                                }`}
+                                    }`}
                             >
                                 {/* Active Indicator Line */}
                                 {active && <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#D4AF37]"></div>}
-                                
-                                <item.icon 
-                                    className={`w-5 h-5 mr-3 transition-colors ${
-                                        active ? 'text-[#D4AF37]' : 'text-gray-400 group-hover:text-gray-600'
-                                    }`} 
+
+                                <item.icon
+                                    className={`w-5 h-5 mr-3 transition-colors ${active ? 'text-[#D4AF37]' : 'text-gray-400 group-hover:text-gray-600'
+                                        }`}
                                 />
                                 {item.name}
                             </Link>
@@ -97,14 +100,20 @@ const UserLayout = () => {
                             </p>
                             <p className="text-xs text-gray-500 truncate">View Profile</p>
                         </div>
-                        <ArrowRightOnRectangleIcon className="w-5 h-5 text-gray-300 hover:text-red-500 transition-colors ml-1" />
+                        <button
+                            onClick={handleLogout}
+                            className="p-1 hover:bg-gray-100 rounded-lg transition-colors group"
+                            title="Logout"
+                        >
+                            <ArrowRightOnRectangleIcon className="w-5 h-5 text-gray-500 group-hover:text-red-500 transition-colors" />
+                        </button>
                     </div>
                 </div>
             </aside>
 
             {/* Main Content Wrapper */}
             <div className="md:pl-64 flex flex-col min-h-screen transition-all duration-300">
-                
+
                 {/* Sticky Glass Header */}
                 <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-100 h-20 px-4 sm:px-8 flex items-center justify-between shadow-sm">
                     <div className="flex items-center gap-4">
@@ -115,7 +124,7 @@ const UserLayout = () => {
                         >
                             <Bars3Icon className="w-6 h-6" />
                         </button>
-                        
+
                         {/* Current Page Title (Dynamic) */}
                         <h2 className="text-lg font-bold text-gray-800 hidden sm:block">
                             {navigation.find(n => isActive(n.href))?.name || 'Dashboard'}
@@ -124,11 +133,10 @@ const UserLayout = () => {
 
                     <div className="flex items-center gap-3 sm:gap-6">
                         {/* Wallet Badge */}
-                        <div className={`hidden sm:flex items-center px-4 py-2 rounded-full border text-sm font-semibold transition-colors ${
-                            user?.walletConnected 
-                                ? 'bg-[#D4AF37]/5 border-[#D4AF37]/20 text-[#D4AF37]' 
+                        <div className={`hidden sm:flex items-center px-4 py-2 rounded-full border text-sm font-semibold transition-colors ${user?.walletConnected
+                                ? 'bg-[#D4AF37]/5 border-[#D4AF37]/20 text-[#D4AF37]'
                                 : 'bg-gray-100 border-gray-200 text-gray-500'
-                        }`}>
+                            }`}>
                             <WalletIcon className="w-4 h-4 mr-2" />
                             {user?.walletConnected ? 'Wallet Connected' : 'No Wallet'}
                         </div>
