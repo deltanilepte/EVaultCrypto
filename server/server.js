@@ -13,6 +13,7 @@ dotenv.config();
 const corsOptions = {
     origin: ['http://localhost:5173', 'http://localhost:5174', 'https://e-vault-crypto.vercel.app', 'https://e-vault-crypto-backend.vercel.app', 'https://e-vault-crypto-backend.vercel.app/api'], // Allow both 5173 and 5174
     methods: 'GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH, PROPFIND',
+    allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
 }
 
@@ -34,6 +35,7 @@ app.get('/', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/investments', investmentRoutes);
 app.use('/api/transactions', transactionRoutes);
+app.use('/api/config', require('./routes/configRoutes'));
 
 const PORT = process.env.PORT || 5000;
 

@@ -36,7 +36,7 @@ const AdminDashboard = () => {
     const totalUsers = allUsers.length;
     const totalInvestments = investments.reduce((sum, inv) => sum + parseFloat(inv.amount), 0);
     const totalWithdrawals = withdrawals.reduce((sum, w) => sum + parseFloat(w.amount), 0);
-    const pendingRequests = investmentRequests.length;
+    const pendingRequests = investmentRequests.filter(i => i.status === 'Pending').length;
 
     const lineData = {
         labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],

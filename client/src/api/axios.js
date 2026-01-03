@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'https://e-vault-crypto-backend.vercel.app/api',
+    baseURL: 'http://localhost:5000/api',
     headers: {
         'Content-Type': 'application/json',
     },
@@ -12,7 +12,10 @@ api.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem('evault_token');
         if (token) {
+            console.log("Attaching token:", token.substring(0, 10) + "...");
             config.headers.Authorization = `Bearer ${token}`;
+        } else {
+            console.warn("No token found in localStorage");
         }
         return config;
     },

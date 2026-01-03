@@ -6,10 +6,13 @@ import {
     ArrowDownTrayIcon,
     UserCircleIcon,
     Bars3Icon,
-    XMarkIcon
+    XMarkIcon,
+    BellIcon,
+    WalletIcon,
+    ArrowRightOnRectangleIcon
 } from '@heroicons/react/24/outline';
 import { useCrypto } from '../../context/CryptoContext';
-import eVault_Logo from '../../../public/eVaultLogoWithBG.png';
+import eVault_Logo from '../../../public/eVaultLogoWithBG2.png';
 
 const UserLayout = () => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -19,7 +22,6 @@ const UserLayout = () => {
     const navigation = [
         { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
         { name: 'New Investment', href: '/dashboard/invest', icon: CurrencyDollarIcon },
-        { name: 'My Investments', href: '/dashboard/my-investments', icon: CurrencyDollarIcon },
         { name: 'Withdrawals', href: '/dashboard/withdraw', icon: ArrowDownTrayIcon },
         { name: 'Profile', href: '/dashboard/profile', icon: UserCircleIcon },
     ];
@@ -27,89 +29,123 @@ const UserLayout = () => {
     const isActive = (path) => location.pathname === path;
 
     return (
-        <div className="min-h-screen bg-gray-50 font-sans">
+        <div className="min-h-screen bg-gray-50/50 font-sans text-gray-900">
             {/* Mobile sidebar overlay */}
             {sidebarOpen && (
                 <div
-                    className="fixed inset-0 z-40 bg-gray-600 bg-opacity-75 md:hidden"
+                    className="fixed inset-0 z-40 bg-gray-900/80 backdrop-blur-sm transition-opacity md:hidden"
                     onClick={() => setSidebarOpen(false)}
                 ></div>
             )}
 
-            {/* Sidebar */}
-            <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-xl transform transition-transform duration-300 ease-in-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}>
-                <div className="flex items-center justify-between h-40 px-6 border-b border-gray-100">
-                    <img src={eVault_Logo} alt="eVault Logo" />
-                    <button className="md:hidden" onClick={() => setSidebarOpen(false)}>
-                        <XMarkIcon className="w-6 h-6 text-gray-500" />
+            {/* Sidebar Navigation */}
+            <aside 
+                className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-100 shadow-2xl md:shadow-none transform transition-transform duration-300 ease-in-out ${
+                    sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+                } md:translate-x-0 flex flex-col`}
+            >
+                {/* Logo Area */}
+                <div className="h-36 flex items-center justify-between px-8 border-b border-gray-50">
+                    <img src={eVault_Logo} alt="eVault Logo" className="h-40 w-auto object-contain" />
+                    <button className="md:hidden p-2 rounded-lg hover:bg-gray-100 text-gray-500 transition-colors" onClick={() => setSidebarOpen(false)}>
+                        <XMarkIcon className="w-6 h-6" />
                     </button>
                 </div>
 
-                <nav className="px-4 py-6 space-y-1">
-                    {navigation.map((item) => (
-                        <Link
-                            key={item.name}
-                            to={item.href}
-                            className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 group relative overflow-hidden ${isActive(item.href)
-                                ? 'text-[#D4AF37] bg-[#D4AF37]/5 border-r-2 border-[#D4AF37]'
-                                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                {/* Nav Links */}
+                <nav className="flex-1 px-4 py-8 space-y-2 overflow-y-auto custom-scrollbar">
+                    <p className="px-4 text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">Main Menu</p>
+                    {navigation.map((item) => {
+                        const active = isActive(item.href);
+                        return (
+                            <Link
+                                key={item.name}
+                                to={item.href}
+                                onClick={() => setSidebarOpen(false)}
+                                className={`group flex items-center px-4 py-3.5 text-sm font-medium rounded-xl transition-all duration-200 relative overflow-hidden ${
+                                    active
+                                        ? 'bg-gray-900 text-white shadow-lg shadow-gray-200'
+                                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                                 }`}
-                        >
-                            <item.icon className="w-5 h-5 mr-3" />
-                            {item.name}
-                        </Link>
-                    ))}
+                            >
+                                {/* Active Indicator Line */}
+                                {active && <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#D4AF37]"></div>}
+                                
+                                <item.icon 
+                                    className={`w-5 h-5 mr-3 transition-colors ${
+                                        active ? 'text-[#D4AF37]' : 'text-gray-400 group-hover:text-gray-600'
+                                    }`} 
+                                />
+                                {item.name}
+                            </Link>
+                        );
+                    })}
                 </nav>
 
-                <div className="absolute bottom-0 w-full p-4 border-t border-gray-100 bg-gray-50/50">
-                    <div className="flex items-center p-2 rounded-lg hover:bg-white hover:shadow-sm transition-all cursor-pointer group">
-                        <div className="flex-shrink-0">
-                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#D4AF37] to-[#B4941F] flex items-center justify-center text-white font-bold shadow-md group-hover:scale-105 transition-transform">
-                                {(user?.name || 'User').charAt(0)}
+                {/* User Profile Card */}
+                <div className="p-4 border-t border-gray-50 bg-gray-50/30">
+                    <div className="flex items-center p-3 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md transition-all cursor-pointer group">
+                        <div className="flex-shrink-0 relative">
+                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#D4AF37] to-[#8a701f] flex items-center justify-center text-white font-bold text-lg shadow-sm">
+                                {(user?.name || 'U').charAt(0).toUpperCase()}
                             </div>
+                            <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
                         </div>
-                        <div className="ml-3">
-                            <p className="text-sm font-medium text-gray-900 group-hover:text-[#D4AF37] transition-colors">{user?.name || 'User'}</p>
-                            <p className="text-xs text-gray-500">View Profile</p>
+                        <div className="ml-3 flex-1 overflow-hidden">
+                            <p className="text-sm font-bold text-gray-900 truncate group-hover:text-[#D4AF37] transition-colors">
+                                {user?.name || 'Investor'}
+                            </p>
+                            <p className="text-xs text-gray-500 truncate">View Profile</p>
                         </div>
+                        <ArrowRightOnRectangleIcon className="w-5 h-5 text-gray-300 hover:text-red-500 transition-colors ml-1" />
                     </div>
                 </div>
-            </div>
+            </aside>
 
-            {/* Main Content */}
-            <div className="md:pl-64 flex flex-col min-h-screen">
-                {/* Bottom Border to separate header from content */}
-                <header className="bg-white shadow-sm h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 border-b border-gray-100">
-                    <button
-                        type="button"
-                        className="md:hidden p-2 text-gray-400 hover:text-gray-500"
-                        onClick={() => setSidebarOpen(true)}
-                    >
-                        <Bars3Icon className="w-6 h-6" />
-                    </button>
+            {/* Main Content Wrapper */}
+            <div className="md:pl-64 flex flex-col min-h-screen transition-all duration-300">
+                
+                {/* Sticky Glass Header */}
+                <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-100 h-20 px-4 sm:px-8 flex items-center justify-between shadow-sm">
+                    <div className="flex items-center gap-4">
+                        <button
+                            type="button"
+                            className="md:hidden p-2 -ml-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
+                            onClick={() => setSidebarOpen(true)}
+                        >
+                            <Bars3Icon className="w-6 h-6" />
+                        </button>
+                        
+                        {/* Current Page Title (Dynamic) */}
+                        <h2 className="text-lg font-bold text-gray-800 hidden sm:block">
+                            {navigation.find(n => isActive(n.href))?.name || 'Dashboard'}
+                        </h2>
+                    </div>
 
-                    <div className="flex-1 flex justify-end items-center space-x-4">
-                        {/* Wallet Status */}
-                        <div className="hidden sm:flex items-center px-4 py-1.5 rounded-full border border-[#D4AF37] bg-[#D4AF37]/5">
-                            <div className={`w-2 h-2 rounded-full mr-2 ${user?.walletConnected ? 'bg-green-500' : 'bg-gray-400'}`}></div>
-                            <span className="text-sm font-medium text-[#D4AF37]">
-                                {user?.walletConnected ? 'Wallet Connected' : 'Wallet Disconnected'}
-                            </span>
+                    <div className="flex items-center gap-3 sm:gap-6">
+                        {/* Wallet Badge */}
+                        <div className={`hidden sm:flex items-center px-4 py-2 rounded-full border text-sm font-semibold transition-colors ${
+                            user?.walletConnected 
+                                ? 'bg-[#D4AF37]/5 border-[#D4AF37]/20 text-[#D4AF37]' 
+                                : 'bg-gray-100 border-gray-200 text-gray-500'
+                        }`}>
+                            <WalletIcon className="w-4 h-4 mr-2" />
+                            {user?.walletConnected ? 'Wallet Connected' : 'No Wallet'}
                         </div>
 
-                        <button className="p-1 text-gray-400 hover:text-[#D4AF37] transition-colors">
-                            <span className="sr-only">Notifications</span>
-                            {/* Notification Bell */}
-                            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                            </svg>
+                        {/* Notification Bell */}
+                        <button className="relative p-2.5 text-gray-400 hover:text-gray-600 transition-colors rounded-xl hover:bg-gray-50">
+                            <span className="absolute top-2.5 right-3 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white animate-pulse"></span>
+                            <BellIcon className="w-6 h-6" />
                         </button>
                     </div>
                 </header>
 
-                {/* Page Content with Mesh Background */}
-                <main className="flex-1 p-4 sm:p-6 lg:p-4 overflow-y-auto mesh-bg relative">
-                    <Outlet />
+                {/* Content Area */}
+                <main className="flex-1 p-4 sm:p-6 overflow-y-auto">
+                    <div className="max-w-8xl mx-auto animate-fade-in-up">
+                        <Outlet />
+                    </div>
                 </main>
             </div>
         </div>

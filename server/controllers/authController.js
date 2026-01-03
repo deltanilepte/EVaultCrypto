@@ -1,4 +1,5 @@
 const User = require('../models/User.js');
+const Investment = require('../models/Investment.js');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
@@ -82,7 +83,14 @@ const getUserProfile = async (req, res) => {
     try {
         const user = await User.findById(req.user.id).select('-password');
         if (user) {
-            res.json(user);
+            // Calculate Total Invested dynamically
+            const investments = await Investment.find({ user: req.user.id });
+            const totalInvested = investments.reduce((acc, inv) => acc + (inv.amount || 0), 0);
+
+            const userObj = user.toObject();
+            userObj.totalInvested = totalInvested;
+
+            res.json(userObj);
         } else {
             res.status(404).json({ message: 'User not found' });
         }
@@ -97,7 +105,18 @@ const getUserProfile = async (req, res) => {
 const getUsers = async (req, res) => {
     try {
         const users = await User.find({});
-        res.json(users);
+
+        // Aggregate investments for each user
+        const usersWithInvestments = await Promise.all(users.map(async (user) => {
+            const investments = await Investment.find({ user: user._id });
+            const totalInvested = investments.reduce((acc, inv) => acc + (inv.amount || 0), 0);
+
+            const userObj = user.toObject();
+            userObj.totalInvested = totalInvested;
+            return userObj;
+        }));
+
+        res.json(usersWithInvestments);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -130,10 +149,48 @@ const addTestFunds = async (req, res) => {
     }
 };
 
+// @desc    Update user profile
+// @route   PUT /api/auth/profile
+// @access  Private
+const updateUserProfile = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+
+        if (user) {
+            user.name = req.body.name || user.name;
+            user.walletAddress = req.body.walletAddress || user.walletAddress;
+
+            if (req.body.password) {
+                const salt = await bcrypt.genSalt(10);
+                user.password = await bcrypt.hash(req.body.password, salt);
+            }
+
+            const updatedUser = await user.save();
+
+            res.json({
+                _id: updatedUser.id,
+                name: updatedUser.name,
+                email: updatedUser.email,
+                isAdmin: updatedUser.isAdmin,
+                token: generateToken(updatedUser.id),
+                balance: updatedUser.balance,
+                totalInvested: updatedUser.totalInvested,
+                totalROI: updatedUser.totalROI,
+                walletAddress: updatedUser.walletAddress
+            });
+        } else {
+            res.status(404).json({ message: 'User not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 module.exports = {
     registerUser,
     loginUser,
     getUserProfile,
+    updateUserProfile,
     getUsers,
     addTestFunds
 };

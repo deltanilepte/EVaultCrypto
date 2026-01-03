@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import eVault_Logo from '../../public/eVaultLogoWithBG.png';
+import eVault_Logo from '../../public/eVaultLogoWithBG2.png';
 
 const Header = () => {
     const [isScrolled, setIsScrolled] = useState(false);
@@ -29,7 +29,7 @@ const Header = () => {
                 <div className="container mx-auto px-6 h-16 flex items-center justify-between">
                     {/* Logo */}
                     <div>
-                        <img className='w-35 h-20' src={eVault_Logo} alt="eVault_Logo" />
+                        <img className='w-35 h-24' src={eVault_Logo} alt="eVault_Logo" />
                     </div>
 
                     {/* Desktop Nav - Centered */}

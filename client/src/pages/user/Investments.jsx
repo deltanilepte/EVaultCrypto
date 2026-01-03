@@ -1,15 +1,36 @@
 import React, { useState, useEffect } from 'react';
 import { useCrypto } from '../../context/CryptoContext';
-import { CalculatorIcon, ClockIcon } from '@heroicons/react/24/outline';
+import {
+    CalculatorIcon,
+    ClockIcon,
+    CurrencyDollarIcon,
+    WalletIcon,
+    ChartBarIcon,
+    CheckCircleIcon,
+    ExclamationCircleIcon,
+    ArrowTrendingUpIcon
+} from '@heroicons/react/24/outline';
 
 const Investments = () => {
-    const { roiRates, addInvestment, investments, user } = useCrypto();
+    const { roiRates, addInvestment, investments, user, claimROI, fetchUserData } = useCrypto();
     const [selectedMethod, setSelectedMethod] = useState('USDT');
     const [amount, setAmount] = useState('');
+    const [walletAddress, setWalletAddress] = useState('');
     const [projectedReturn, setProjectedReturn] = useState(0);
     const [duration, setDuration] = useState('30 Days');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+
+    const handleClaim = async (id) => {
+        const res = await claimROI(id);
+        if (res.success) {
+            setSuccess(res.message);
+            setTimeout(() => setSuccess(''), 3000);
+        } else {
+            setError(res.message);
+            setTimeout(() => setError(''), 3000);
+        }
+    };
 
     useEffect(() => {
         if (!amount || isNaN(amount)) {
@@ -31,10 +52,42 @@ const Investments = () => {
 
     }, [amount, selectedMethod, roiRates]);
 
+    // Initialize wallet address from user profile if available
+    // AND Auto-fill Receiver Wallet based on Admin Config (Primary) or History (Secondary)
+    useEffect(() => {
+        // 1. Check if Admin has configured a wallet for this token
+        const adminWallet = roiRates[selectedMethod]?.walletAddress;
+        if (adminWallet) {
+            setWalletAddress(adminWallet);
+            return;
+        }
+
+        // 2. Fallback: Find last investment for this method
+        if (investments.length > 0) {
+            const historyForMethod = investments
+                .filter(inv => inv.method === selectedMethod)
+                .sort((a, b) => new Date(b.createdAt || b.startDate) - new Date(a.createdAt || a.startDate));
+
+            if (historyForMethod.length > 0 && historyForMethod[0].receiverWalletAddress) {
+                setWalletAddress(historyForMethod[0].receiverWalletAddress);
+                return;
+            }
+        }
+
+        // 3. Keep empty if no data
+        setWalletAddress('');
+
+    }, [selectedMethod, investments, roiRates]);
+
     const handleSubmit = (e) => {
         e.preventDefault();
         setError('');
         setSuccess('');
+
+        if (!user?.walletAddress) {
+            setError('Please connect your wallet first to start investing.');
+            return;
+        }
 
         if (!amount || amount <= 0) {
             setError('Please enter a valid amount.');
@@ -45,7 +98,8 @@ const Investments = () => {
         addInvestment({
             method: selectedMethod,
             amount: parseFloat(amount),
-            walletAddress: user?.walletAddress || ''
+            walletAddress: user?.walletAddress || '', // Sender
+            receiverWalletAddress: walletAddress // Receiver input
         });
 
         setSuccess('Investment request submitted successfully!');
@@ -53,170 +107,336 @@ const Investments = () => {
         setTimeout(() => setSuccess(''), 3000);
     };
 
+    useEffect(() => {
+        fetchUserData();
+    }, []);
+
     return (
-        <div className="space-y-6">
-            <div className="flex justify-between items-center">
-                <h1 className="text-2xl font-bold text-gray-900">New Investment</h1>
+        <div className="space-y-8 max-w-7xl mx-auto pb-12">
+
+            {/* Header */}
+            <div>
+                <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Investment Portfolio</h1>
+                <p className="text-gray-500 mt-1">Grow your assets with our high-yield staking pools.</p>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Investment Form */}
-                <div className="lg:col-span-2">
-                    <div className="bg-white rounded-xl shadow-lg border border-[#D4AF37]/20 p-8">
-                        <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center">
-                            <CurrencyIcon className="w-6 h-6 mr-2 text-[#D4AF37]" />
-                            Create Portfolio
-                        </h2>
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+                {/* Left Side: Investment Form */}
+                <div className="xl:col-span-2">
+                    <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div className="p-8 border-b border-gray-100 flex items-center justify-between">
+                            <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                                <ChartBarIcon className="w-6 h-6 text-[#D4AF37]" />
+                                Create New Position
+                            </h2>
+                            <span className="text-xs font-semibold bg-[#D4AF37]/10 text-[#D4AF37] px-3 py-1 rounded-full uppercase tracking-wide">
+                                Guaranteed Returns
+                            </span>
+                        </div>
 
-                        {error && <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm">{error}</div>}
-                        {success && <div className="mb-4 p-3 bg-green-50 text-green-600 rounded-lg text-sm">{success}</div>}
+                        {error && (
+                            <div className="bg-red-50 border-l-4 border-red-500 p-4 mx-8 mt-6 flex items-center gap-3">
+                                <ExclamationCircleIcon className="w-5 h-5 text-red-500" />
+                                <span className="text-red-700 text-sm font-medium">{error}</span>
+                            </div>
+                        )}
+                        {success && (
+                            <div className="bg-green-50 border-l-4 border-green-500 p-4 mx-8 mt-6 flex items-center gap-3">
+                                <CheckCircleIcon className="w-5 h-5 text-green-500" />
+                                <span className="text-green-700 text-sm font-medium">{success}</span>
+                            </div>
+                        )}
 
-                        <form onSubmit={handleSubmit} className="space-y-6">
+                        <form onSubmit={handleSubmit} className="p-8 space-y-8">
+
+                            {/* Asset Selection */}
+                            <div className="space-y-4">
+                                <label className="block text-sm font-semibold text-gray-700">Select Asset Class</label>
+                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+                                    {Object.entries(roiRates).map(([token, info]) => (
+                                        <div
+                                            key={token}
+                                            onClick={() => setSelectedMethod(token)}
+                                            className={`group cursor-pointer rounded-2xl p-4 transition-all duration-200 border relative overflow-hidden ${selectedMethod === token
+                                                ? 'bg-gray-900 border-gray-900 shadow-xl -translate-y-1'
+                                                : 'bg-white border-gray-200 hover:border-[#D4AF37] hover:shadow-md'
+                                                }`}
+                                        >
+                                            {selectedMethod === token && (
+                                                <div className="absolute top-0 right-0 w-16 h-16 bg-[#D4AF37] opacity-10 rounded-bl-full -mr-8 -mt-8"></div>
+                                            )}
+                                            <div className="flex flex-col items-center justify-center text-center space-y-3 relative z-10">
+                                                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold transition-colors ${selectedMethod === token ? 'bg-[#D4AF37] text-white' : 'bg-gray-100 text-gray-600 group-hover:bg-[#D4AF37]/10 group-hover:text-[#D4AF37]'
+                                                    }`}>
+                                                    {token[0]}
+                                                </div>
+                                                <div>
+                                                    <p className={`font-bold transition-colors ${selectedMethod === token ? 'text-white' : 'text-gray-700'}`}>{token}</p>
+                                                    <p className={`text-xs ${selectedMethod === token ? 'text-gray-400' : 'text-gray-500'}`}>{info.rate}% {info.period}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Select Asset</label>
-                                    <select
-                                        value={selectedMethod}
-                                        onChange={(e) => setSelectedMethod(e.target.value)}
-                                        className="w-full rounded-lg border-gray-300 focus:border-[#D4AF37] focus:ring focus:ring-[#D4AF37]/20 transition-shadow py-3"
-                                    >
-                                        {Object.keys(roiRates).map(token => (
-                                            <option key={token} value={token}>{token}</option>
-                                        ))}
-                                    </select>
+                                {/* Sender Wallet Address (Read-Only) */}
+                                <div className="space-y-2">
+                                    <label className="text-sm font-semibold text-gray-700">Your Wallet Address (Sender)</label>
+                                    <div className="relative">
+                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <WalletIcon className="h-5 w-5 text-gray-400" />
+                                        </div>
+                                        <input
+                                            required
+                                            type="text"
+                                            value={user?.walletAddress || 'Not Connected'}
+                                            readOnly
+                                            className="block w-full pl-10 pr-4 py-3.5 border border-gray-200 rounded-xl bg-gray-100 text-gray-500 cursor-not-allowed focus:ring-0"
+                                        />
+                                    </div>
                                 </div>
+
+                                {/* Receiver Wallet Address (Editable) */}
+                                <div className="space-y-2">
+                                    <label className="text-sm font-semibold text-gray-700">Receiver Wallet Address</label>
+                                    <div className="relative">
+                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <WalletIcon className="h-5 w-5 text-[#D4AF37]" />
+                                        </div>
+                                        <input
+                                            type="text"
+                                            value={walletAddress}
+                                            onChange={(e) => setWalletAddress(e.target.value)}
+                                            placeholder="Enter receiver wallet address"
+                                            className="block w-full pl-10 pr-4 py-3.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent transition-all bg-gray-50 focus:bg-white"
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Amount */}
+                                <div className="space-y-2 md:col-span-2">
+                                    <label className="text-sm font-semibold text-gray-700 flex justify-between">
+                                        <span>Investment Amount</span>
+                                        <span className="text-xs text-[#D4AF37] font-medium">Min: $50</span>
+                                    </label>
+                                    <div className="relative">
+                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <CurrencyDollarIcon className="h-5 w-5 text-gray-400" />
+                                        </div>
+                                        <input
+                                            type="number"
+                                            value={amount}
+                                            onChange={(e) => setAmount(e.target.value)}
+                                            placeholder="0.00"
+                                            className="block w-full pl-10 pr-4 py-3.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent transition-all bg-gray-50 focus:bg-white font-medium"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Info Card */}
+                            <div className="bg-gradient-to-br from-gray-50 to-white border border-gray-200 rounded-2xl p-6 shadow-sm">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Investment Amount ($)</label>
+                                    <p className="text-sm text-gray-500 font-medium mb-1">Current ROI Rate</p>
+                                    <div className="flex items-baseline gap-2">
+                                        <p className="text-2xl font-bold text-[#D4AF37]">{roiRates[selectedMethod].rate}%</p>
+                                        <span className="text-xs font-semibold text-gray-400 uppercase bg-gray-100 px-2 py-0.5 rounded">{roiRates[selectedMethod].period}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Terms & Submit */}
+                            <div className="pt-2">
+                                <div className="flex items-center mb-6">
                                     <input
-                                        type="number"
-                                        value={amount}
-                                        onChange={(e) => setAmount(e.target.value)}
-                                        placeholder="Min: $50"
-                                        className="w-full rounded-lg border-gray-300 focus:border-[#D4AF37] focus:ring focus:ring-[#D4AF37]/20 transition-shadow py-3"
+                                        type="checkbox"
+                                        required
+                                        className="h-5 w-5 text-[#D4AF37] focus:ring-[#D4AF37] border-gray-300 rounded cursor-pointer transition-colors"
+                                        id="terms"
                                     />
+                                    <label htmlFor="terms" className="ml-3 block text-sm text-gray-600 cursor-pointer select-none">
+                                        I agree to the <span className="text-[#D4AF37] font-semibold hover:underline">Terms & Conditions</span> of the smart contract.
+                                    </label>
                                 </div>
-                            </div>
 
-                            {/* Dynamic Rate Info */}
-                            <div className="bg-gradient-to-r from-gray-50 to-white border border-gray-100 rounded-lg p-5 flex items-center justify-between">
-                                <div>
-                                    <p className="text-sm text-gray-500">Expected ROI Rate</p>
-                                    <p className="text-lg font-bold text-[#D4AF37]">
-                                        {roiRates[selectedMethod].rate}%
-                                        <span className="text-sm font-normal text-gray-400 ml-1">{roiRates[selectedMethod].period}</span>
-                                    </p>
-                                </div>
-                                <div className="text-right">
-                                    <p className="text-sm text-gray-500">Duration</p>
-                                    <p className="text-lg font-bold text-gray-800">{duration}</p>
-                                </div>
+                                <button
+                                    type="submit"
+                                    className={`w-full py-4 bg-gradient-to-r ${!user?.walletAddress ? 'from-gray-400 to-gray-500 cursor-not-allowed' : 'from-gray-900 to-gray-800 hover:shadow-xl hover:-translate-y-1'} text-white font-bold rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center gap-2 group`}
+                                >
+                                    <span>{user?.walletAddress ? 'START INVESTMENT' : 'CONNECT WALLET FIRST'}</span>
+                                    {user?.walletAddress && <ArrowTrendingUpIcon className="w-5 h-5 text-[#D4AF37] group-hover:translate-x-1 transition-transform" />}
+                                </button>
                             </div>
-
-                            <div className="flex items-center">
-                                <input type="checkbox" required className="h-4 w-4 text-[#D4AF37] focus:ring-[#D4AF37] border-gray-300 rounded" />
-                                <label className="ml-2 block text-sm text-gray-600">
-                                    I agree to the <a href="#" className="text-[#D4AF37] hover:underline">Terms & Conditions</a> of investment.
-                                </label>
-                            </div>
-
-                            <button
-                                type="submit"
-                                className="w-full py-4 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-white font-bold rounded-lg shadow-lg hover:shadow-xl hover:scale-[1.01] transition-all transform"
-                            >
-                                Invest Now
-                            </button>
                         </form>
                     </div>
                 </div>
 
-                {/* ROI Calculator Preview Widget */}
-                <div className="lg:col-span-1">
-                    <div className="bg-gray-900 text-white rounded-xl shadow-xl p-6 relative overflow-hidden">
-                        {/* Decorative circle */}
-                        <div className="absolute -top-10 -right-10 w-32 h-32 bg-[#D4AF37] opacity-20 rounded-full blur-xl"></div>
+                {/* Right Side: Calculator Widget */}
+                <div className="xl:col-span-1">
+                    <div className="sticky top-8">
+                        <div className="bg-gray-900 text-white rounded-3xl shadow-2xl p-8 relative overflow-hidden border border-gray-800">
+                            {/* Abstract Background Elements */}
+                            <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 rounded-full bg-[#D4AF37] opacity-10 blur-3xl"></div>
+                            <div className="absolute bottom-0 left-0 -ml-10 -mb-10 w-40 h-40 rounded-full bg-blue-500 opacity-5 blur-2xl"></div>
 
-                        <h3 className="text-lg font-bold mb-6 flex items-center">
-                            <CalculatorIcon className="w-5 h-5 mr-2 text-[#D4AF37]" />
-                            Projection
-                        </h3>
+                            <div className="relative z-10">
+                                <h3 className="text-lg font-bold mb-8 flex items-center gap-2 text-[#D4AF37]">
+                                    <CalculatorIcon className="w-6 h-6" />
+                                    Projection Analysis
+                                </h3>
 
-                        <div className="space-y-6">
-                            <div className="flex justify-between items-end border-b border-gray-700 pb-4">
-                                <span className="text-gray-400 text-sm">Invested Amount</span>
-                                <span className="text-xl font-mono">${amount || '0.00'}</span>
-                            </div>
-                            <div className="flex justify-between items-end border-b border-gray-700 pb-4">
-                                <span className="text-gray-400 text-sm">Total Profit</span>
-                                <span className="text-xl font-mono text-[#D4AF37]">+${projectedReturn}</span>
-                            </div>
-                            <div className="flex justify-between items-end pb-2">
-                                <span className="text-gray-300 font-medium">Total Return</span>
-                                <div className="text-right">
-                                    <span className="text-2xl font-bold block text-white">
-                                        ${(parseFloat(amount || 0) + parseFloat(projectedReturn || 0)).toFixed(2)}
-                                    </span>
-                                    <span className="text-xs text-gray-500">In {duration}</span>
+                                <div className="space-y-6">
+                                    <div className="flex justify-between items-end border-b border-gray-800 pb-4">
+                                        <span className="text-gray-400 text-sm">Principal Amount</span>
+                                        <span className="text-xl font-mono tracking-wide">${amount || '0.00'}</span>
+                                    </div>
+                                    <div className="flex justify-between items-end border-b border-gray-800 pb-4">
+                                        <span className="text-gray-400 text-sm">Est. Profit</span>
+                                        <span className="text-xl font-mono text-[#D4AF37]">+${projectedReturn}</span>
+                                    </div>
+
+                                    <div className="pt-4 pb-2">
+                                        <div className="flex justify-between items-center mb-2">
+                                            <span className="text-gray-300 font-medium text-sm">Total Maturity Value</span>
+                                            <span className="text-xs text-gray-500 bg-gray-800 px-2 py-1 rounded">In {duration}</span>
+                                        </div>
+                                        <div className="text-right">
+                                            <span className="text-4xl font-bold block text-white tracking-tight">
+                                                ${(parseFloat(amount || 0) + parseFloat(projectedReturn || 0)).toFixed(2)}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="mt-8 p-4 bg-gray-800/50 rounded-xl text-xs text-gray-400 leading-relaxed border border-gray-700/50 backdrop-blur-sm">
+                                    <div className="flex gap-2">
+                                        <ClockIcon className="w-4 h-4 text-gray-500 shrink-0 mt-0.5" />
+                                        <p>Returns are calculated based on current APY. Settlements are processed automatically to your wallet balance upon maturity.</p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-
-                        <div className="mt-8 p-4 bg-gray-800 rounded-lg text-xs text-gray-400 leading-relaxed">
-                            <ClockIcon className="w-4 h-4 inline mr-1 mb-0.5" />
-                            Returns are calculated based on current market rates. Settlements are processed automatically to your wallet balance.
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* Simple History Table */}
-            <div>
-                <h2 className="text-xl font-bold text-gray-900 mb-4">Investment History</h2>
-                <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            {/* Investment History */}
+            <div className="space-y-4">
+                <div className="flex items-center justify-between px-2">
+                    <h2 className="text-xl font-bold text-gray-900">Active Portfolio</h2>
+                    <span className="text-sm text-gray-500">{investments.length} Active Positions</span>
+                </div>
+
+                <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
                     <div className="overflow-x-auto">
-                        <table className="min-w-full text-left text-sm">
-                            <thead className="bg-gray-50 text-gray-500 font-medium">
+                        <table className="min-w-full text-left">
+                            <thead className="bg-gray-50/80 border-b border-gray-100">
                                 <tr>
-                                    <th className="px-6 py-4">Date</th>
-                                    <th className="px-6 py-4">Method</th>
-                                    <th className="px-6 py-4">Amount</th>
-                                    <th className="px-6 py-4">Returns</th>
-                                    <th className="px-6 py-4">Status</th>
+                                    <th className="px-8 py-5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Started Date</th>
+                                    <th className="px-8 py-5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Method</th>
+                                    <th className="px-8 py-5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Principal</th>
+                                    <th className="px-8 py-5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Total Returns</th>
+                                    <th className="px-8 py-5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Next Claim</th>
+                                    <th className="px-8 py-5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Status</th>
+                                    <th className="px-8 py-5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Action</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
-                                {investments.map((inv) => (
-                                    <tr key={inv._id}>
-                                        <td className="px-6 py-4 text-gray-500">{new Date(inv.date || inv.createdAt).toLocaleDateString()}</td>
-                                        <td className="px-6 py-4 font-medium">{inv.method}</td>
-                                        <td className="px-6 py-4">${inv.amount}</td>
-                                        <td className="px-6 py-4 text-green-600">+${inv.returns}</td>
-                                        <td className="px-6 py-4">
-                                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${inv.status === 'Active' ? 'bg-green-100 text-green-700' :
-                                                inv.status === 'Completed' ? 'bg-blue-100 text-blue-700' :
-                                                    'bg-yellow-100 text-yellow-700'
-                                                }`}>
-                                                {inv.status}
-                                            </span>
+                                {investments.length === 0 ? (
+                                    <tr>
+                                        <td colSpan="7" className="px-8 py-16 text-center">
+                                            <div className="flex flex-col items-center justify-center text-gray-400">
+                                                <ChartBarIcon className="w-12 h-12 mb-3 text-gray-300" />
+                                                <p className="font-medium">No investments found.</p>
+                                                <p className="text-sm mt-1">Start your portfolio using the form above.</p>
+                                            </div>
                                         </td>
                                     </tr>
-                                ))}
+                                ) : (
+                                    investments.map((inv) => {
+                                        const lastClaim = new Date(inv.lastClaimedAt).getTime();
+                                        const periodDays = inv.roiPeriod === 'Daily' ? 1 : 30;
+                                        const periodMs = periodDays * 24 * 60 * 60 * 1000;
+                                        const nextClaimTime = lastClaim + periodMs;
+                                        const now = Date.now();
+                                        const isClaimable = now >= nextClaimTime && inv.status === 'Active';
+
+                                        const timeDiff = nextClaimTime - now;
+                                        const hoursLeft = Math.ceil(timeDiff / (1000 * 60 * 60));
+                                        const daysLeft = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+
+                                        let nextClaimText = 'Available Now';
+                                        if (!isClaimable && inv.status === 'Active') {
+                                            if (inv.roiPeriod === 'Daily') {
+                                                nextClaimText = `in ${hoursLeft} hrs`;
+                                            } else {
+                                                nextClaimText = `in ${daysLeft} days`;
+                                            }
+                                        } else if (inv.status !== 'Active') {
+                                            nextClaimText = '-';
+                                        }
+
+                                        return (
+                                            <tr key={inv._id} className="hover:bg-gray-50/50 transition-colors">
+                                                <td className="px-8 py-5 text-sm text-gray-600">
+                                                    {inv.startDate ? new Date(inv.startDate).toLocaleDateString() : 'Pending'}
+                                                </td>
+                                                <td className="px-8 py-5">
+                                                    <span className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md text-xs font-bold bg-gray-100 text-gray-700 border border-gray-200">
+                                                        {inv.method}
+                                                    </span>
+                                                </td>
+                                                <td className="px-8 py-5 text-sm font-medium text-gray-900 font-mono">${inv.amount}</td>
+                                                <td className="px-8 py-5 text-sm font-bold text-green-600 font-mono">
+                                                    +${inv.returns ? inv.returns.toFixed(2) : '0.00'}
+                                                </td>
+                                                <td className="px-8 py-5 text-xs text-gray-500 font-medium">
+                                                    {nextClaimText === 'Available Now' ? (
+                                                        <span className="text-green-600 animate-pulse font-bold">{nextClaimText}</span>
+                                                    ) : (
+                                                        nextClaimText
+                                                    )}
+                                                </td>
+                                                <td className="px-8 py-5">
+                                                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${inv.status === 'Active' ? 'bg-green-100 text-green-700 border border-green-200' :
+                                                        inv.status === 'Completed' ? 'bg-blue-100 text-blue-700 border border-blue-200' :
+                                                            'bg-yellow-100 text-yellow-800 border border-yellow-200'
+                                                        }`}>
+                                                        <span className={`w-1.5 h-1.5 rounded-full ${inv.status === 'Active' ? 'bg-green-500' :
+                                                            inv.status === 'Completed' ? 'bg-blue-500' :
+                                                                'bg-yellow-500'
+                                                            }`}></span>
+                                                        {inv.status}
+                                                    </span>
+                                                </td>
+                                                <td className="px-8 py-5">
+                                                    {inv.status === 'Active' && (
+                                                        <button
+                                                            onClick={() => handleClaim(inv._id)}
+                                                            disabled={!isClaimable}
+                                                            className={`px-4 py-2 text-xs font-bold rounded-lg shadow-sm transition-all duration-200 flex items-center gap-2 ${isClaimable
+                                                                ? 'bg-[#D4AF37] text-white hover:bg-[#b5952f] hover:shadow-md cursor-pointer hover:-translate-y-0.5'
+                                                                : 'bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200'
+                                                                }`}
+                                                        >
+                                                            {isClaimable && <ArrowTrendingUpIcon className="w-3 h-3" />}
+                                                            CLAIM ROI
+                                                        </button>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                        )
+                                    })
+                                )}
                             </tbody>
                         </table>
-                        {investments.length === 0 && (
-                            <div className="p-8 text-center text-gray-400">No investment history found.</div>
-                        )}
                     </div>
                 </div>
             </div>
         </div>
     );
 };
-
-// Simple Icon component placeholder since we didn't import one for the header
-const CurrencyIcon = ({ className }) => (
-    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-    </svg>
-);
 
 export default Investments;

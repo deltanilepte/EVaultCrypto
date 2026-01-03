@@ -37,6 +37,7 @@ import UserLayout from './pages/user/UserLayout';
 import UserDashboard from './pages/user/Dashboard';
 import Investments from './pages/user/Investments';
 import Withdrawals from './pages/user/Withdrawals';
+import Profile from './pages/user/Profile';
 import AdminLayout from './pages/admin/AdminLayout';
 
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -70,9 +71,8 @@ function App() {
             <Route path="/dashboard" element={<UserLayout />}>
               <Route index element={<UserDashboard />} />
               <Route path="invest" element={<Investments />} />
-              <Route path="my-investments" element={<Investments />} />
               <Route path="withdraw" element={<Withdrawals />} />
-              <Route path="profile" element={<div className="p-10 text-center text-gray-500">Profile Settings (Coming Soon)</div>} />
+              <Route path="profile" element={<Profile />} />
             </Route>
 
             {/* Admin Routes */}

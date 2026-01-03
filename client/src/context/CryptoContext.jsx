@@ -19,24 +19,41 @@ export const CryptoProvider = ({ children }) => {
 
     // ROI Rates (Could be fetched from backend config)
     const [roiRates, setRoiRates] = useState({
-        USDT: { rate: 3.5, period: 'Daily' },
-        DODGE: { rate: 0.66, period: 'Monthly' },
-        XRP: { rate: 0.66, period: 'Monthly' },
-        ETH: { rate: 0.66, period: 'Monthly' },
-        SOL: { rate: 0.83, period: 'Monthly' },
-        BNB: { rate: 0.83, period: 'Monthly' },
-        BTC: { rate: 1.0, period: 'Monthly' },
+        USDT: { rate: 3.5, period: 'Daily', walletAddress: '' },
+        DODGE: { rate: 0.66, period: 'Monthly', walletAddress: '' },
+        XRP: { rate: 0.66, period: 'Monthly', walletAddress: '' },
+        ETH: { rate: 0.66, period: 'Monthly', walletAddress: '' },
+        SOL: { rate: 0.83, period: 'Monthly', walletAddress: '' },
+        BNB: { rate: 0.83, period: 'Monthly', walletAddress: '' },
+        BTC: { rate: 1.0, period: 'Monthly', walletAddress: '' },
     });
 
-    // Valid Token Check
+
+
+    // Valid Token Check & Fetch Config
     useEffect(() => {
-        const checkUser = async () => {
+        const init = async () => {
+            // 1. Fetch Config (Rates & Wallets)
+            try {
+                const { data } = await api.get('/config');
+                if (data && data.roiRates) {
+                    // Normalize map to object if needed
+                    const rates = data.roiRates; // Assuming API returns object map
+                    setRoiRates(prev => ({
+                        ...prev,
+                        ...rates
+                    }));
+                }
+            } catch (err) {
+                console.error("Failed to load config", err);
+            }
+
+            // 2. Hydrate User
             const token = localStorage.getItem('evault_token');
             if (token) {
                 try {
                     const { data } = await api.get('/auth/profile');
-                    setUser({ ...data, walletConnected: false }); // Hydrate user
-                    // Fetch Users Data
+                    setUser({ ...data, walletConnected: false });
                     if (data.isAdmin) {
                         fetchAdminData();
                     } else {
@@ -50,7 +67,7 @@ export const CryptoProvider = ({ children }) => {
             }
             setLoading(false);
         };
-        checkUser();
+        init();
     }, []);
 
     const fetchUserData = async () => {
@@ -66,11 +83,11 @@ export const CryptoProvider = ({ children }) => {
 
     const fetchAdminData = async () => {
         try {
-            const invReqRes = await api.get('/investments/admin'); // In real app, separate approved/pending if needed
-            setInvestmentRequests(invReqRes.data.filter(i => i.status === 'Pending'));
+            const invReqRes = await api.get('/investments/admin');
+            setInvestmentRequests(invReqRes.data);
 
             const txReqRes = await api.get('/transactions/admin');
-            setWithdrawalRequests(txReqRes.data.filter(t => t.type === 'Withdrawal' && t.status === 'Pending'));
+            setWithdrawalRequests(txReqRes.data.filter(t => t.type === 'Withdrawal'));
 
             // Fetch all users
             const usersRes = await api.get('/auth/users');
@@ -79,6 +96,18 @@ export const CryptoProvider = ({ children }) => {
             console.error('Error fetching admin data', err);
         }
     };
+
+    // ... (lines 101-240 unchanged methods for addFunds, login, etc. keep them)
+    // I need to be careful not to delete lines between here.
+    // The user's replace_file_content tool requires me to target specific blocks. 
+    // I am replacing the useEffect block and the updateRoiRate function separately or together.
+    // Let's target the useEffect block first.
+
+    // Wait, the tool requires CONTINUOUS block replacement.
+    // Splitting this into two calls for safety.
+
+    // CALL 1: UPDATE useEffect
+
 
     const addFunds = async () => {
         try {
@@ -115,6 +144,16 @@ export const CryptoProvider = ({ children }) => {
         } catch (err) {
             setError(err.response?.data?.message || 'Registration failed');
             return { success: false, message: err.response?.data?.message };
+        }
+    };
+
+    const updateUserProfile = async (userData) => {
+        try {
+            const { data } = await api.put('/auth/profile', userData);
+            setUser(prev => ({ ...prev, ...data }));
+            return { success: true, message: 'Profile updated successfully' };
+        } catch (err) {
+            return { success: false, message: err.response?.data?.message || 'Update failed' };
         }
     };
 
@@ -182,12 +221,12 @@ export const CryptoProvider = ({ children }) => {
         try {
             // Optimistic update for UI input
             setInvestmentRequests(prev => prev.map(req =>
-                req._id === id ? { ...req, walletAddress: address } : req
+                req._id === id ? { ...req, receiverWalletAddress: address } : req
             ));
             // Debounce actual API call in a real app, or save on blur/button.
             // For now, let's assume this updates state locally and we need a "Save" button or call API on change?
             // User requested "editable". I'll trigger API update
-            await api.put(`/investments/${id}`, { walletAddress: address });
+            await api.put(`/investments/${id}`, { receiverWalletAddress: address });
         } catch (err) {
             console.error(err);
         }
@@ -211,11 +250,45 @@ export const CryptoProvider = ({ children }) => {
         }
     };
 
-    const updateRoiRate = (token, newRate) => {
+    const claimROI = async (id) => {
+        try {
+            const { data } = await api.post(`/investments/${id}/claim`);
+            // Update local state
+            setInvestments(prev => prev.map(inv =>
+                inv._id === id ? {
+                    ...inv,
+                    returns: data.investment.returns,
+                    lastClaimedAt: data.investment.lastClaimedAt
+                } : inv
+            ));
+            setUser(prev => ({
+                ...prev,
+                balance: data.newBalance,
+                totalROI: prev.totalROI + data.claimedAmount
+            }));
+            return { success: true, message: `Claimed $${data.claimedAmount.toFixed(4)}` };
+        } catch (err) {
+            return { success: false, message: err.response?.data?.message || 'Claim failed' };
+        }
+    };
+
+    const updateRoiRate = async (token, updates) => {
+        // Optimistic update
         setRoiRates(prev => ({
             ...prev,
-            [token]: { ...prev[token], rate: newRate }
+            [token]: { ...prev[token], ...updates }
         }));
+
+        try {
+            await api.put('/config', {
+                roiRates: {
+                    [token]: updates
+                }
+            });
+        } catch (err) {
+            console.error("Failed to save ROI config", err);
+            // Optionally revert state here if critical
+        }
     };
 
     return (
@@ -233,16 +306,19 @@ export const CryptoProvider = ({ children }) => {
             addFunds,
             login,
             register,
+            updateUserProfile,
             logout,
             connectWallet,
             addInvestment,
             requestWithdrawal,
             updateRoiRate,
             approveInvestment,
+            fetchUserData,
             rejectInvestment,
             approveWithdrawal,
             rejectWithdrawal,
-            updateRequestWallet
+            updateRequestWallet,
+            claimROI
         }}>
             {children}
         </CryptoContext.Provider>

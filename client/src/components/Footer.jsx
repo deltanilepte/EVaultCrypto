@@ -25,12 +25,13 @@ const Footer = () => {
 
                     {/* Brand */}
                     <div className="col-span-1 md:col-span-2">
-                        <div className="flex items-center gap-2 mb-6">
+                        {/* <div className="flex items-center gap-2 mb-6">
                             <div className="w-8 h-8 rounded-lg bg-gradient-gold flex items-center justify-center text-[#0F172A] font-bold">E</div>
                             <div className="text-2xl font-black tracking-tighter text-white">
                                 VAULT
                             </div>
-                        </div>
+                        </div> */}
+                        <img src="/eVaultLogoWithBG2.png" alt="Logo" className="w-52 h-32 mb-6" />
                         <p className="text-gray-400 leading-relaxed mb-8 text-sm">
                             The world's most trusted staking platform. Secure your future with intelligent crypto investment solutions.
                         </p>

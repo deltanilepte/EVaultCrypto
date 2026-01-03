@@ -4,6 +4,7 @@ const {
     getMyInvestments,
     getAdminInvestments,
     updateInvestment,
+    claimInvestmentROI
 } = require('../controllers/investmentController.js');
 const { protect } = require('../middleware/authMiddleware.js');
 
@@ -18,5 +19,8 @@ router.route('/admin')
 
 router.route('/:id')
     .put(protect, updateInvestment);
+
+router.route('/:id/claim')
+    .post(protect, claimInvestmentROI);
 
 module.exports = router;
