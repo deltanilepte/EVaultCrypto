@@ -16,20 +16,20 @@ const Partners = () => {
     ];
 
     return (
-        <section id="partners" className="bg-white border-y border-gold/20 flex relative z-20 overflow-hidden h-28 shadow-lg">
+        <section id="partners" className="bg-white border-y border-gold/20 flex flex-col md:flex-row relative z-20 overflow-hidden h-auto md:h-28 shadow-lg">
             {/* Fixed Title Section - Golden Theme */}
-            <div className="bg-gradient-to-br from-[#0F172A] via-[#1E293B] to-[#0F172A] text-white p-6 flex items-center z-30 min-w-[320px] shadow-2xl shadow-gold/20 relative overflow-hidden">
+            <div className="bg-gradient-to-br from-[#0F172A] via-[#1E293B] to-[#0F172A] text-white p-4 md:p-6 flex items-center justify-center md:justify-start z-30 w-full md:w-auto md:min-w-[320px] shadow-2xl shadow-gold/20 relative overflow-hidden">
 
                 {/* Content */}
                 <div className="relative z-10 flex items-center gap-3">
                     <motion.div
                         animate={{ rotate: [0, 360] }}
                         transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                        className="w-10 h-10 rounded-full bg-gradient-to-br from-[#FFD700] to-[#D4AF37] flex items-center justify-center shadow-lg shadow-gold/50"
+                        className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-br from-[#FFD700] to-[#D4AF37] flex items-center justify-center shadow-lg shadow-gold/50"
                     >
                         <Sparkles size={20} className="text-[#0F172A]" />
                     </motion.div>
-                    <h3 className="text-xl font-black leading-tight">
+                    <h3 className="text-lg md:text-xl font-black leading-tight">
                         A Global network of <br />
                         <span className="text-gradient-gold">Partners!</span>
                     </h3>
@@ -37,7 +37,7 @@ const Partners = () => {
             </div>
 
             {/* Scrolling Marquee - Enhanced */}
-            <div className="flex-1 flex items-center overflow-hidden bg-gradient-to-r from-gray-50 via-white to-gray-50 relative">
+            <div className="flex-1 w-full h-16 md:h-auto flex items-center overflow-hidden bg-gradient-to-r from-gray-50 via-white to-gray-50 relative">
 
                 {/* Marquee Container */}
                 <div className="flex animate-scroll whitespace-nowrap">

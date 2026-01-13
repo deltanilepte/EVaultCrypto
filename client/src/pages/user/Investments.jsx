@@ -173,6 +173,9 @@ const Investments = () => {
                                                 <div>
                                                     <p className={`font-bold transition-colors ${selectedMethod === token ? 'text-white' : 'text-gray-700'}`}>{token}</p>
                                                     <p className={`text-xs ${selectedMethod === token ? 'text-gray-400' : 'text-gray-500'}`}>{info.rate}% {info.period}</p>
+                                                    {token === 'USDT' && (
+                                                        <p className={`text-[10px] mt-0.5 font-medium ${selectedMethod === token ? 'text-gray-400' : 'text-gray-500'}`}>including principal</p>
+                                                    )}
                                                 </div>
                                             </div>
                                         </div>
@@ -236,13 +239,47 @@ const Investments = () => {
                                 </div>
                             </div>
 
-                            {/* Info Card */}
                             <div className="bg-gradient-to-br from-gray-50 to-white border border-gray-200 rounded-2xl p-6 shadow-sm">
-                                <div>
+                                <div className="mb-6">
                                     <p className="text-sm text-gray-500 font-medium mb-1">Current ROI Rate</p>
                                     <div className="flex items-baseline gap-2">
-                                        <p className="text-2xl font-bold text-[#D4AF37]">{roiRates[selectedMethod].rate}%</p>
+                                        <p className="text-3xl font-bold text-[#D4AF37]">{roiRates[selectedMethod].rate}%</p>
                                         <span className="text-xs font-semibold text-gray-400 uppercase bg-gray-100 px-2 py-0.5 rounded">{roiRates[selectedMethod].period}</span>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 pt-4 border-t border-gray-100">
+                                    <div>
+                                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Monthly</p>
+                                        <p className="text-lg font-bold text-gray-700">
+                                            {(roiRates[selectedMethod].period === 'Daily'
+                                                ? (roiRates[selectedMethod].rate * 30)
+                                                : roiRates[selectedMethod].rate).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}%
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Quarterly</p>
+                                        <p className="text-lg font-bold text-gray-700">
+                                            {(roiRates[selectedMethod].period === 'Daily'
+                                                ? (roiRates[selectedMethod].rate * 90)
+                                                : (roiRates[selectedMethod].rate * 3)).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}%
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Half Yearly</p>
+                                        <p className="text-lg font-bold text-gray-700">
+                                            {(roiRates[selectedMethod].period === 'Daily'
+                                                ? (roiRates[selectedMethod].rate * 180)
+                                                : (roiRates[selectedMethod].rate * 6)).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}%
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Yearly</p>
+                                        <p className="text-lg font-bold text-gray-700">
+                                            {(roiRates[selectedMethod].period === 'Daily'
+                                                ? (roiRates[selectedMethod].rate * 365)
+                                                : (roiRates[selectedMethod].rate * 12)).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}%
+                                        </p>
                                     </div>
                                 </div>
                             </div>

@@ -69,7 +69,7 @@ const StakingInfo = () => {
 
                         <div className="space-y-8 relative">
                             {/* Connecting Line - Darker/Subtle to match normal state */}
-                            <div className="absolute left-[29px] top-6 bottom-6 w-0.5 bg-gray-600" />
+                            <div className="absolute left-[23px] md:left-[31px] top-6 bottom-6 w-0.5 bg-gray-600" />
 
                             {steps.map((step, index) => (
                                 <motion.div
@@ -78,16 +78,16 @@ const StakingInfo = () => {
                                     whileInView={{ opacity: 1, x: 0 }}
                                     viewport={{ once: true }}
                                     transition={{ delay: 0.2 + (index * 0.1) }}
-                                    className="flex gap-8 group relative z-10 items-start "
+                                    className="flex gap-4 md:gap-8 group relative z-10 items-start pr-12 md:pr-0"
                                 >
                                     {/* Circle Indicator */}
-                                    <div className="w-16 h-16 rounded-full bg-white border border-[#1E293B] group-hover:border-[#D4AF37] flex items-center justify-center text-[#1E293B] group-hover:text-[#D4AF37] bg-white group-hover:bg-white shadow-sm hover:shadow-[0_0_15px_rgba(212,175,55,0.4)] transition-all duration-300 relative shrink-0">
-                                        <span className="font-bold text-lg relative z-10">{step.number}</span>
+                                    <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-white border border-[#1E293B] group-hover:border-[#D4AF37] flex items-center justify-center text-[#1E293B] group-hover:text-[#D4AF37] bg-white group-hover:bg-white shadow-sm hover:shadow-[0_0_15px_rgba(212,175,55,0.4)] transition-all duration-300 relative shrink-0">
+                                        <span className="font-bold text-base md:text-lg relative z-10">{step.number}</span>
                                     </div>
 
-                                    <div className="pt-2">
-                                        <h3 className="text-2xl font-bold text-[#0F172A] mb-2 group-hover:text-[#D4AF37] transition-colors">{step.title}</h3>
-                                        <p className="text-gray-500 text-lg leading-relaxed">{step.description}</p>
+                                    <div className="pt-1 md:pt-2">
+                                        <h3 className="text-xl md:text-2xl font-bold text-[#0F172A] mb-1 md:mb-2 group-hover:text-[#D4AF37] transition-colors">{step.title}</h3>
+                                        <p className="text-gray-500 text-base md:text-lg leading-relaxed">{step.description}</p>
                                     </div>
                                 </motion.div>
                             ))}
@@ -110,7 +110,7 @@ const StakingInfo = () => {
                             initial={{ opacity: 0, scale: 0.9 }}
                             whileInView={{ opacity: 1, scale: 1 }}
                             viewport={{ once: true }}
-                            className="relative z-10 bg-white p-4 rounded-[2.5rem] shadow-2xl shadow-gray-400 border-3 border-[#FFD700] ring-1 ring-gray-100 max-w-sm mx-auto"
+                            className="relative z-10 bg-white p-4 rounded-[2.5rem] shadow-2xl shadow-gray-400 border-3 border-[#FFD700] ring-1 ring-gray-100 max-w-sm mx-auto scale-90 md:scale-100 origin-center"
                         >
                             <div className="bg-[#0F172A] rounded-3xl p-6 text-white mb-6 relative overflow-hidden">
                                 <div className="absolute top-0 right-0 w-32 h-32 bg-[#D4AF37]/20 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
@@ -152,7 +152,7 @@ const StakingInfo = () => {
                         </motion.div>
 
                         {/* Decor Elements */}
-                        <div className="absolute z-10 top-1/2 -translate-y-1/2 -right-4 md:-right-12 bg-white p-4 rounded-2xl shadow-2xl animate-bounce duration-[4000ms] border-2 border-[#FFD700]">
+                        <div className="absolute z-10 top-[60%] md:top-1/2 -translate-y-1/2 -right-2 md:-right-12 bg-white p-3 md:p-4 rounded-2xl shadow-2xl animate-bounce duration-[4000ms] border-2 border-[#FFD700] scale-75 md:scale-100 origin-right">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600">
                                     <TrendingUp size={20} />

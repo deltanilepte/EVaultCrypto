@@ -268,8 +268,8 @@ const UserDashboard = () => {
                             <span className="text-xs font-medium text-gray-400 bg-gray-800 px-2 py-1 rounded">Live Updates</span>
                         </div>
 
-                        <div className="space-y-4">
-                            {Object.entries(roiRates).slice(0, 4).map(([token, info], idx) => (
+                        <div className="space-y-4 max-h-[320px] overflow-y-auto pr-2 custom-scrollbar">
+                            {Object.entries(roiRates).map(([token, info], idx) => (
                                 <div key={token} className="group flex items-center justify-between p-3 rounded-xl bg-gray-800/50 hover:bg-gray-800 border border-gray-700/50 transition-all cursor-default">
                                     <div className="flex items-center gap-3">
                                         <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-gray-900 text-sm ${idx === 0 ? 'bg-[#D4AF37]' : 'bg-gray-700 text-white group-hover:bg-[#D4AF37] group-hover:text-gray-900 transition-colors'
@@ -279,6 +279,9 @@ const UserDashboard = () => {
                                         <div>
                                             <p className="font-bold text-sm">{token}</p>
                                             <p className="text-xs text-gray-400">{info.period} Returns</p>
+                                            {token === 'USDT' && (
+                                                <p className="text-[10px] text-gray-500 font-medium">including principal</p>
+                                            )}
                                         </div>
                                     </div>
                                     <div className="text-right">
@@ -288,7 +291,10 @@ const UserDashboard = () => {
                             ))}
                         </div>
 
-                        <button className="w-full mt-6 py-3 rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 text-sm font-bold transition-colors flex items-center justify-center gap-2">
+                        <button
+                            onClick={() => window.location.href = '/dashboard/invest'}
+                            className="w-full mt-6 py-3 rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 text-sm font-bold transition-colors flex items-center justify-center gap-2"
+                        >
                             View All Markets
                             <ArrowTopRightOnSquareIcon className="w-4 h-4" />
                         </button>

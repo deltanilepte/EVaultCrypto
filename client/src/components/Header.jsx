@@ -29,7 +29,7 @@ const Header = () => {
                 <div className="container mx-auto px-6 h-16 flex items-center justify-between">
                     {/* Logo */}
                     <div>
-                        <img className='w-35 h-24' src={eVault_Logo} alt="eVault_Logo" />
+                        <img className='h-12 md:h-20 w-auto' src={eVault_Logo} alt="eVault_Logo" />
                     </div>
 
                     {/* Desktop Nav - Centered */}
@@ -92,12 +92,12 @@ const Header = () => {
                             <hr className="border-gray-100" />
                             <div className="flex flex-col gap-3">
                                 <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>
-                                    <button className="border-2 border-navy text-navy font-bold py-4 rounded-lg w-full hover:bg-navy hover:text-white transition-all">
+                                    <button className="border-2 border-[#0F172A] text-[#0F172A] font-bold py-4 rounded-lg w-full hover:bg-[#0F172A] hover:text-white transition-all">
                                         Login
                                     </button>
                                 </Link>
                                 <Link to="/register" onClick={() => setIsMobileMenuOpen(false)}>
-                                    <button className="bg-gradient-to-r from-navy to-navy-light text-white font-bold py-4 rounded-lg w-full shadow-lg shadow-navy/30">
+                                    <button className="bg-gradient-to-r from-[#0F172A] to-[#1E293B] text-white font-bold py-4 rounded-lg w-full shadow-lg shadow-[#0F172A]/30">
                                         Sign Up
                                     </button>
                                 </Link>

@@ -10,7 +10,8 @@ import {
     DocumentCheckIcon,
     ChevronRightIcon,
     ShieldCheckIcon,
-    ArrowRightOnRectangleIcon
+    ArrowRightOnRectangleIcon,
+    EnvelopeIcon
 } from '@heroicons/react/24/outline';
 import eVault_Logo from '../../../public/eVaultLogoWithBG2.png';
 
@@ -33,6 +34,7 @@ const AdminLayout = () => {
         { name: 'User Management', href: '/admin/users', icon: UsersIcon },
         { name: 'Investment Requests', href: '/admin/investments', icon: BanknotesIcon },
         { name: 'Withdrawal Requests', href: '/admin/withdrawals', icon: DocumentCheckIcon },
+        { name: 'Newsletter', href: '/admin/newsletter', icon: EnvelopeIcon },
     ];
 
     const isActive = (path) => location.pathname === path || (path !== '/admin' && location.pathname.startsWith(path));

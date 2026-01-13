@@ -53,13 +53,13 @@ const AboutUs = () => {
                             </div>
 
                             {/* Decorative Elements */}
-                            <div className="absolute -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] border border-gold/20 rounded-full animate-spin-slow" style={{ animationDuration: '20s' }}></div>
-                            <div className="absolute -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[140%] h-[140%] border border-navy/5 rounded-full animate-spin-slow placeholder-dashed" style={{ animationDuration: '30s', borderStyle: 'dashed' }}></div>
+                            <div className="absolute -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[100%] md:w-[120%] h-[100%] md:h-[120%] border border-gold/20 rounded-full animate-spin-slow" style={{ animationDuration: '20s' }}></div>
+                            <div className="absolute -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] md:w-[140%] h-[120%] md:h-[140%] border border-navy/5 rounded-full animate-spin-slow placeholder-dashed" style={{ animationDuration: '30s', borderStyle: 'dashed' }}></div>
                         </div>
                     </motion.div>
 
                     {/* Right Column: Content */}
-                    <div className="flex-1">
+                    <div className="flex-1 pr-0">
                         <motion.div
                             initial={{ opacity: 0, y: 30 }}
                             whileInView={{ opacity: 1, y: 0 }}
@@ -71,12 +71,12 @@ const AboutUs = () => {
                                 ABOUT eVAULT CRYPTO BANK
                             </div>
 
-                            <h2 className="text-4xl md:text-5xl font-black text-navy mb-6 leading-tight">
+                            <h2 className="text-3xl md:text-5xl font-black text-navy mb-6 leading-tight">
                                 The Future of <br />
                                 <span className="text-gradient-gold">Decentralized Finance</span>
                             </h2>
 
-                            <p className="text-gray-500 text-lg mb-8 leading-relaxed">
+                            <p className="text-gray-500 text-md mb-8 leading-relaxed">
                                 eVault Crypto Bank bridges the gap between traditional banking reliability and DeFi innovation. We provide a secure, transparent, and high-yield platform for investors to grow their wealth through automated staking strategies.
                             </p>
 

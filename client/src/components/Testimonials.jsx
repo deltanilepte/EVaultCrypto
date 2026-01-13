@@ -103,8 +103,8 @@ const Testimonials = () => {
                     </motion.p>
                 </div>
 
-                {/* Testimonial Cards Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+                {/* Testimonial Cards Grid/Carousel */}
+                <div className="flex md:grid md:grid-cols-2 lg:grid-cols-3 overflow-x-auto md:overflow-visible gap-4 md:gap-8 mb-16 pb-4 md:pb-0 snap-x snap-mandatory scrollbar-hide">
                     {testimonials.map((t, i) => (
                         <motion.div
                             key={i}
@@ -117,12 +117,7 @@ const Testimonials = () => {
                                 type: "spring",
                                 stiffness: 100
                             }}
-                            whileHover={{
-                                y: -8,
-                                scale: 1.02,
-                                transition: { duration: 0.2 }
-                            }}
-                            className="group relative"
+                            className="group relative min-w-[300px] w-[85vw] md:w-auto snap-center flex-shrink-0"
                         >
                             {/* Card Container */}
                             <div className="relative bg-gradient-to-br from-white to-gray-50 rounded-3xl p-8 shadow-xl border-2 border-gray-200 hover:border-[#D4AF37]/80 hover:shadow-2xl hover:shadow-[#D4AF37]/20 transition-all duration-500 h-full overflow-hidden">
@@ -209,7 +204,7 @@ const Testimonials = () => {
                             <div className="w-12 h-1 bg-gradient-to-r from-[#D4AF37] to-transparent mx-auto mt-3"></div>
                         </div>
                         <div className="text-center">
-                            <div className="text-4xl font-black text-white mb-2">$2.1B+</div>
+                            <div className="text-4xl font-black text-white mb-2">$25.4M</div>
                             <div className="text-gray-300 text-sm font-medium">Total Assets Staked</div>
                             <div className="w-12 h-1 bg-gradient-to-r from-[#D4AF37] to-transparent mx-auto mt-3"></div>
                         </div>

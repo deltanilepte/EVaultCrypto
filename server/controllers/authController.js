@@ -58,11 +58,16 @@ const loginUser = async (req, res) => {
         const user = await User.findOne({ email });
 
         if (user && (await bcrypt.compare(password, user.password))) {
+            if (user.isBlocked) {
+                return res.status(403).json({ message: 'Your account has been blocked. Please contact support.' });
+            }
+
             res.json({
                 _id: user.id,
                 name: user.name,
                 email: user.email,
                 isAdmin: user.isAdmin,
+                isBlocked: user.isBlocked,
                 token: generateToken(user.id),
                 balance: user.balance,
                 totalInvested: user.totalInvested,
@@ -224,6 +229,31 @@ const forgotPassword = async (req, res) => {
     }
 };
 
+// @desc    Block/Unblock a user (Admin)
+// @route   PUT /api/auth/users/:id/block
+// @access  Private/Admin
+const toggleUserBlockStatus = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id);
+
+        if (user) {
+            user.isBlocked = !user.isBlocked;
+            const updatedUser = await user.save();
+            res.json({
+                _id: updatedUser._id,
+                name: updatedUser.name,
+                email: updatedUser.email,
+                isBlocked: updatedUser.isBlocked,
+                isAdmin: updatedUser.isAdmin
+            });
+        } else {
+            res.status(404).json({ message: 'User not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 module.exports = {
     registerUser,
     loginUser,
@@ -231,5 +261,6 @@ module.exports = {
     updateUserProfile,
     getUsers,
     addTestFunds,
-    forgotPassword
+    forgotPassword,
+    toggleUserBlockStatus
 };

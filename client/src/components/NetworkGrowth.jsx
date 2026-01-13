@@ -69,7 +69,7 @@ const NetworkGrowth = () => {
                     </motion.div>
 
                     {/* Right Column: Phone Mockups */}
-                    <div className="relative h-[600px] perspective-[2000px]">
+                    <div className="hidden md:block relative h-[600px] perspective-[2000px]">
 
                         {/* Phone 1: Left - Transaction History */}
                         <motion.div

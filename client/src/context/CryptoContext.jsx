@@ -20,12 +20,12 @@ export const CryptoProvider = ({ children }) => {
     // ROI Rates (Could be fetched from backend config)
     const [roiRates, setRoiRates] = useState({
         USDT: { rate: 3.5, period: 'Daily', walletAddress: '' },
-        DODGE: { rate: 0.66, period: 'Monthly', walletAddress: '' },
-        XRP: { rate: 0.66, period: 'Monthly', walletAddress: '' },
-        ETH: { rate: 0.66, period: 'Monthly', walletAddress: '' },
-        SOL: { rate: 0.83, period: 'Monthly', walletAddress: '' },
-        BNB: { rate: 0.83, period: 'Monthly', walletAddress: '' },
-        BTC: { rate: 1.0, period: 'Monthly', walletAddress: '' },
+        DODGE: { rate: 3, period: 'Monthly', walletAddress: '' },
+        XRP: { rate: 3, period: 'Monthly', walletAddress: '' },
+        ETH: { rate: 2.7, period: 'Monthly', walletAddress: '' },
+        SOL: { rate: 2.9, period: 'Monthly', walletAddress: '' },
+        BNB: { rate: 2.91, period: 'Monthly', walletAddress: '' },
+        BTC: { rate: 3.1, period: 'Monthly', walletAddress: '' },
     });
 
 

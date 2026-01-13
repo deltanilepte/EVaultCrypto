@@ -101,24 +101,24 @@ const Exchanges = () => {
 
             {/* Stats Bar */}
             <div className="container mx-auto px-6 mt-20 relative z-10">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto">
-                    <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 border-2 border-gray-200 shadow-lg hover:border-[#D4AF37]/50 hover:shadow-xl transition-all duration-300">
-                        <div className="text-3xl font-black text-[#0F172A] mb-2">50M+</div>
-                        <div className="text-gray-600 text-sm font-medium">Active Traders</div>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 max-w-3xl mx-auto">
+                    <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 md:p-6 border-2 border-gray-200 shadow-lg hover:border-[#D4AF37]/50 hover:shadow-xl transition-all duration-300">
+                        <div className="text-2xl md:text-3xl font-black text-[#0F172A] mb-2">50M+</div>
+                        <div className="text-gray-600 text-xs md:text-sm font-medium">Active Traders</div>
                         <div className="w-full h-1 bg-gray-200 rounded-full mt-4 overflow-hidden">
                             <div className="w-3/4 h-full bg-gradient-to-r from-[#D4AF37] to-[#B8860B] rounded-full"></div>
                         </div>
                     </div>
-                    <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 border-2 border-gray-200 shadow-lg hover:border-[#D4AF37]/50 hover:shadow-xl transition-all duration-300">
-                        <div className="text-3xl font-black text-[#0F172A] mb-2">$2T+</div>
-                        <div className="text-gray-600 text-sm font-medium">Daily Volume</div>
+                    <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 md:p-6 border-2 border-gray-200 shadow-lg hover:border-[#D4AF37]/50 hover:shadow-xl transition-all duration-300">
+                        <div className="text-2xl md:text-3xl font-black text-[#0F172A] mb-2">25.4M</div>
+                        <div className="text-gray-600 text-xs md:text-sm font-medium">Daily Volume</div>
                         <div className="w-full h-1 bg-gray-200 rounded-full mt-4 overflow-hidden">
                             <div className="w-4/5 h-full bg-gradient-to-r from-[#D4AF37] to-[#B8860B] rounded-full"></div>
                         </div>
                     </div>
-                    <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 border-2 border-gray-200 shadow-lg hover:border-[#D4AF37]/50 hover:shadow-xl transition-all duration-300">
-                        <div className="text-3xl font-black text-[#0F172A] mb-2">24/7</div>
-                        <div className="text-gray-600 text-sm font-medium">Trading Support</div>
+                    <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 md:p-6 border-2 border-gray-200 shadow-lg hover:border-[#D4AF37]/50 hover:shadow-xl transition-all duration-300 col-span-2 md:col-span-1">
+                        <div className="text-2xl md:text-3xl font-black text-[#0F172A] mb-2">24/7</div>
+                        <div className="text-gray-600 text-xs md:text-sm font-medium">Trading Support</div>
                         <div className="w-full h-1 bg-gray-200 rounded-full mt-4 overflow-hidden">
                             <div className="w-full h-full bg-gradient-to-r from-[#D4AF37] to-[#B8860B] rounded-full"></div>
                         </div>

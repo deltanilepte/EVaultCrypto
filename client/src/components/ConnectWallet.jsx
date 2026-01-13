@@ -209,7 +209,7 @@ const ConnectWallet = () => {
                 {/* Stats */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-16 max-w-3xl mx-auto">
                     {[
-                        { value: "2M+", label: "Wallets Connected", color: "text-[#D4AF37]" },
+                        { value: "90k+", label: "Wallets Connected", color: "text-[#D4AF37]" },
                         { value: "99.9%", label: "Uptime", color: "text-green-500" },
                         { value: "<60s", label: "Connection Time", color: "text-blue-500" },
                         { value: "50+", label: "Countries", color: "text-purple-500" },

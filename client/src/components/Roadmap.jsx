@@ -105,8 +105,8 @@ const Roadmap = () => {
                         {roadmapData.map((item, index) => (
                             <motion.div
                                 key={index}
-                                initial={{ opacity: 0, y: 50, scale: 0.95 }}
-                                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                                initial={{ opacity: 0, x: index % 2 === 0 ? -100 : 100, scale: 0.95 }}
+                                whileInView={{ opacity: 1, x: 0, scale: 1 }}
                                 viewport={{ once: true, margin: "-100px" }}
                                 transition={{
                                     duration: 0.6,
@@ -145,7 +145,7 @@ const Roadmap = () => {
                                 <div className={`w-full md:w-[calc(50%-8rem)] mt-24 md:mt-0 ${index % 2 === 0 ? 'md:text-right' : 'md:text-left'}`}>
                                     <motion.div
                                         whileHover={{ scale: 1.02, y: -5 }}
-                                        className={`relative bg-gradient-to-br from-white to-[#FFFBF5] p-6 rounded-3xl shadow-2xl border-2 ${item.status === 'completed' ? 'border-[#FFEBB2] shadow-[#D4AF37]/20' : item.status === 'active' ? 'border-[#FFD700]/40 shadow-[#FFD700]/20' : 'border-gray-200'} hover:shadow-[0_25px_50px_-12px_rgba(212,175,55,0.3)] hover:border-[#D4AF37]/60 transition-all duration-500 group overflow-hidden`}
+                                        className={`relative bg-gradient-to-br from-white to-[#FFFBF5] p-2 sm:p-6 rounded-3xl shadow-2xl border-2 ${item.status === 'completed' ? 'border-[#FFEBB2] shadow-[#D4AF37]/20' : item.status === 'active' ? 'border-[#FFD700]/40 shadow-[#FFD700]/20' : 'border-gray-200'} hover:shadow-[0_25px_50px_-12px_rgba(212,175,55,0.3)] hover:border-[#D4AF37]/60 transition-all duration-500 group overflow-hidden`}
                                     >
                                         {/* Gold Corner Accents */}
                                         <div className="absolute top-4 left-4 w-3 h-3 rounded-full bg-gradient-to-br from-[#D4AF37] to-[#B8860B] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -153,7 +153,7 @@ const Roadmap = () => {
 
                                         {/* Date Badge with Gold Theme */}
                                         <div className="flex items-center gap-4">
-                                            <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border ${getStatusColor(item.status)} mb-6 group-hover:border-[#D4AF37] group-hover:bg-gradient-to-r from-[#FFF8E1] to-[#FFEBB2] group-hover:text-[#B8860B] group-hover:shadow-lg group-hover:shadow-[#D4AF37]/20 transition-all duration-300`}>
+                                            <div className={`inline-flex items-center gap-2 px-4 py-1 rounded-full border ${getStatusColor(item.status)} mb-6 group-hover:border-[#D4AF37] group-hover:bg-gradient-to-r from-[#FFF8E1] to-[#FFEBB2] group-hover:text-[#B8860B] group-hover:shadow-lg group-hover:shadow-[#D4AF37]/20 transition-all duration-300`}>
                                                 <Clock size={14} />
                                                 <span className="font-bold">{item.date}</span>
                                                 {item.status === 'active' && (
@@ -162,7 +162,7 @@ const Roadmap = () => {
                                             </div>
 
                                             {/* Title with Gold Icon */}
-                                            <h3 className="text-2xl font-black text-[#0F172A] mb-4 group-hover:text-[#B8860B] transition-colors duration-300 flex items-center gap-3">
+                                            <h3 className="text-xl font-black text-[#0F172A] mb-4 group-hover:text-[#B8860B] transition-colors duration-300 flex items-center gap-3">
                                                 {index % 2 === 0 ? (
                                                     <>
                                                         <span>{item.title}</span>
@@ -182,7 +182,7 @@ const Roadmap = () => {
                                         </div>
 
                                         {/* Description */}
-                                        <p className={`text-gray-600 leading-relaxed ${index % 2 === 0 ? 'md:text-right' : 'md:text-left'} font-medium text-lg`}>
+                                        <p className={`text-gray-600 leading-relaxed ${index % 2 === 0 ? 'md:text-right' : 'md:text-left'} font-medium text-sm`}>
                                             {item.description}
                                         </p>
                                     </motion.div>

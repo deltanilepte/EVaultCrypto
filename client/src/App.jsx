@@ -50,6 +50,7 @@ import TokenManagement from './pages/admin/TokenManagement';
 import UserManagement from './pages/admin/UserManagement';
 import InvestmentRequests from './pages/admin/InvestmentRequests';
 import WithdrawalRequests from './pages/admin/WithdrawalRequests';
+import NewsletterManagement from './pages/admin/NewsletterManagement';
 
 function App() {
   return (
@@ -88,6 +89,7 @@ function App() {
               <Route path="users" element={<UserManagement />} />
               <Route path="investments" element={<InvestmentRequests />} />
               <Route path="withdrawals" element={<WithdrawalRequests />} />
+              <Route path="newsletter" element={<NewsletterManagement />} />
             </Route>
 
           </Routes>

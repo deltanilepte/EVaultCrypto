@@ -101,16 +101,16 @@ const FAQ = () => {
                                 {/* Question Button */}
                                 <button
                                     onClick={() => setOpenIndex(openIndex === index ? -1 : index)}
-                                    className="w-full p-6 flex items-center justify-between gap-4 text-left transition-all"
+                                    className="w-full p-4 md:p-6 flex items-start md:items-center justify-between gap-3 md:gap-4 text-left transition-all"
                                 >
-                                    <div className="flex items-center gap-4 flex-1">
+                                    <div className="flex items-start md:items-center gap-3 md:gap-4 flex-1">
                                         {/* Icon */}
-                                        <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${faq.color} flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                                            {faq.icon}
+                                        <div className={`w-10 h-10 md:w-12 md:h-12 rounded-xl bg-gradient-to-br ${faq.color} flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform duration-300 flex-shrink-0`}>
+                                            {React.cloneElement(faq.icon, { size: 18 })}
                                         </div>
 
                                         {/* Question Text */}
-                                        <h3 className={`text-lg font-bold transition-colors ${openIndex === index ? 'text-[#D4AF37]' : 'text-[#0F172A] group-hover:text-[#D4AF37]'
+                                        <h3 className={`text-base md:text-lg font-bold transition-colors mt-2 md:mt-0 ${openIndex === index ? 'text-[#D4AF37]' : 'text-[#0F172A] group-hover:text-[#D4AF37]'
                                             }`}>
                                             {faq.question}
                                         </h3>
@@ -136,9 +136,9 @@ const FAQ = () => {
                                             transition={{ duration: 0.3 }}
                                             className="overflow-hidden"
                                         >
-                                            <div className="px-6 pb-6 pl-[88px]">
-                                                <div className="border-l-2 border-[#D4AF37]/30 pl-6">
-                                                    <p className="text-gray-600 leading-relaxed">
+                                            <div className="px-4 pb-4 md:px-6 md:pb-6 pl-4 md:pl-[88px]">
+                                                <div className="border-l-2 border-[#D4AF37]/30 pl-4 md:pl-6">
+                                                    <p className="text-gray-600 leading-relaxed text-sm md:text-base">
                                                         {faq.answer}
                                                     </p>
                                                 </div>
@@ -176,9 +176,14 @@ const FAQ = () => {
                             <a href="mailto:support@evaultcryptobank.com" className="bg-gradient-to-r from-[#0F172A] to-[#1E293B] text-white font-bold py-3 px-8 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                                 Contact Support
                             </a>
-                            <button className="border-2 border-[#D4AF37] text-[#D4AF37] font-bold py-3 px-8 rounded-xl hover:bg-[#D4AF37]/5 transition-all duration-300">
+                            <a
+                                href="/evoult about us.docx"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="border-2 border-[#D4AF37] text-[#D4AF37] font-bold py-3 px-8 rounded-xl hover:bg-[#D4AF37]/5 transition-all duration-300 inline-block text-center"
+                            >
                                 View Documentation
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </motion.div>

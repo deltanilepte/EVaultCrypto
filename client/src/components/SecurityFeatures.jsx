@@ -126,8 +126,8 @@ const SecurityFeatures = () => {
                             transition={{ duration: 0.6, delay: 0.3 }}
                             className="flex justify-center mb-8"
                         >
-                            <div className="relative w-20 h-20 rounded-2xl bg-gradient-to-br from-[#D4AF37] to-[#B8860B] flex items-center justify-center shadow-2xl shadow-[#D4AF37]/30">
-                                <div className="text-white text-4xl font-black">E</div>
+                            <div className="relative w-40 h-16 rounded-2xl bg-gradient-to-br from-[#D4AF37] to-[#B8860B] flex items-center justify-center shadow-2xl shadow-[#D4AF37]/30">
+                                <div className="text-white text-4xl font-black">eVault</div>
                                 <div className="absolute -inset-2 rounded-2xl border-2 border-[#D4AF37]/60 animate-ping" />
                             </div>
                         </motion.div>

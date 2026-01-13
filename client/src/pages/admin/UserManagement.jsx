@@ -65,6 +65,19 @@ const UserManagement = () => {
     const nextPage = () => currentPage < totalPages && setCurrentPage(currentPage + 1);
     const prevPage = () => currentPage > 1 && setCurrentPage(currentPage - 1);
 
+    // Toggle Block Status
+    const toggleBlockStatus = async (id) => {
+        try {
+            const { data } = await api.put(`/auth/users/${id}/block`);
+            setUsers(prev => prev.map(user =>
+                user._id === id ? { ...user, isBlocked: data.isBlocked } : user
+            ));
+        } catch (error) {
+            console.error("Failed to toggle block status", error);
+            alert("Failed to update user status");
+        }
+    };
+
     // Format date
     const formatDate = (dateString) => {
         const date = new Date(dateString);
@@ -189,27 +202,34 @@ const UserManagement = () => {
                                         <span>Total Withdrawn</span>
                                     </div>
                                 </th>
+                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                    Status
+                                </th>
+                                <th className="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                    Actions
+                                </th>
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
                             {currentUsers.length > 0 ? (
                                 currentUsers.map((user) => (
                                     <tr
-                                        key={user.id}
-                                        className="hover:bg-gray-50 transition-colors duration-150 group"
+                                        key={user._id}
+                                        className={`hover:bg-gray-50 transition-colors duration-150 group ${user.isBlocked ? 'bg-red-50/50' : ''}`}
                                     >
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <div className="text-sm font-mono text-gray-900 bg-gray-50 rounded-lg px-3 py-1 inline-block">
-                                                #{user.id}
+                                                #{user._id.slice(-6)}
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-cyan-400 flex items-center justify-center text-white font-bold text-sm">
+                                                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm ${user.isBlocked ? 'bg-gray-400' : 'bg-gradient-to-r from-blue-500 to-cyan-400'
+                                                    }`}>
                                                     {user.name?.charAt(0) || 'U'}
                                                 </div>
                                                 <div>
-                                                    <div className="text-sm font-semibold text-gray-900">{user.name}</div>
+                                                    <div className={`text-sm font-semibold ${user.isBlocked ? 'text-gray-500' : 'text-gray-900'}`}>{user.name}</div>
                                                 </div>
                                             </div>
                                         </td>
@@ -220,7 +240,7 @@ const UserManagement = () => {
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <div className="flex items-center gap-2">
                                                 <span className="text-xs font-mono text-gray-600 bg-gray-100 px-2 py-1 rounded border border-gray-200">
-                                                    {user.walletAddress || 'Not Connected'}
+                                                    {user.walletAddress ? `${user.walletAddress.slice(0, 6)}...` : 'Not Connected'}
                                                 </span>
                                             </div>
                                         </td>
@@ -245,6 +265,25 @@ const UserManagement = () => {
                                             <span className="text-sm font-semibold text-red-500">
                                                 ${(user.totalWithdrawn || 0).toLocaleString()}
                                             </span>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${user.isBlocked
+                                                ? 'bg-red-100 text-red-700'
+                                                : 'bg-green-100 text-green-700'
+                                                }`}>
+                                                {user.isBlocked ? 'Blocked' : 'Active'}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-right">
+                                            <button
+                                                onClick={() => toggleBlockStatus(user._id)}
+                                                className={`px-3 py-1 rounded-lg text-xs font-bold border transition-colors ${user.isBlocked
+                                                    ? 'border-gray-300 text-gray-700 hover:bg-gray-100'
+                                                    : 'border-red-200 text-red-600 hover:bg-red-50'
+                                                    }`}
+                                            >
+                                                {user.isBlocked ? 'Unblock' : 'Block'}
+                                            </button>
                                         </td>
                                     </tr>
                                 ))

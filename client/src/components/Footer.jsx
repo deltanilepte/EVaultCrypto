@@ -1,7 +1,38 @@
-import React from 'react';
-import { Twitter, Linkedin, Facebook, Instagram, Mail, ArrowUpRight } from 'lucide-react';
+import React, { useState } from 'react';
+import { Twitter, Linkedin, Facebook, Instagram, Mail, ArrowUpRight, Loader2, Check, AlertCircle } from 'lucide-react';
+import axiosInstance from '../api/axios';
 
 const Footer = () => {
+    const [email, setEmail] = useState('');
+    const [status, setStatus] = useState('idle'); // idle, loading, success, error
+    const [message, setMessage] = useState('');
+
+    const handleSubscribe = async (e) => {
+        e.preventDefault();
+        if (!email) return;
+
+        setStatus('loading');
+        setMessage('');
+
+        try {
+            await axiosInstance.post('/newsletter', { email });
+            setStatus('success');
+            setMessage('Subscribed successfully!');
+            setEmail('');
+            setTimeout(() => {
+                setStatus('idle');
+                setMessage('');
+            }, 3000);
+        } catch (error) {
+            setStatus('error');
+            setMessage(error.response?.data?.error || 'Subscription failed. Try again.');
+            setTimeout(() => {
+                setStatus('idle');
+                setMessage('');
+            }, 3000);
+        }
+    };
+
     return (
         <footer className="bg-[#0F172A] py-10 text-white border-t border-gold/20 relative overflow-hidden">
             {/* Shooting Stars / Meteor Rain Effect */}
@@ -85,16 +116,35 @@ const Footer = () => {
                             </div>
                         </div>
 
-                        <div className="flex bg-white/5 p-1 rounded-lg border border-white/10 focus-within:border-gold/50 transition-colors">
+                        <form onSubmit={handleSubscribe} className="flex bg-white/5 p-1 rounded-lg border border-white/10 focus-within:border-gold/50 transition-colors relative">
                             <input
                                 type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
                                 placeholder="Enter your email"
                                 className="bg-transparent border-none outline-none text-white px-4 py-2 w-full text-sm placeholder-gray-500"
+                                disabled={status === 'loading' || status === 'success'}
                             />
-                            <button className="bg-gradient-gold hover:brightness-110 text-white px-4 py-2 rounded-md font-bold transition-colors shadow-lg shadow-gold/20">
-                                <Mail size={18} />
+                            <button
+                                type="submit"
+                                disabled={status === 'loading' || status === 'success'}
+                                className={`bg-gradient-gold hover:brightness-110 text-white px-4 py-2 rounded-md font-bold transition-colors shadow-lg shadow-gold/20 flex items-center justify-center min-w-[50px] ${status === 'success' ? 'bg-green-500' : ''}`}
+                            >
+                                {status === 'loading' ? (
+                                    <Loader2 size={18} className="animate-spin" />
+                                ) : status === 'success' ? (
+                                    <Check size={18} />
+                                ) : (
+                                    <Mail size={18} />
+                                )}
                             </button>
-                        </div>
+                        </form>
+                        {message && (
+                            <div className={`mt-2 text-xs flex items-center gap-1 ${status === 'error' ? 'text-red-400' : 'text-green-400'}`}>
+                                {status === 'error' && <AlertCircle size={12} />}
+                                {message}
+                            </div>
+                        )}
                     </div>
                 </div>
 
