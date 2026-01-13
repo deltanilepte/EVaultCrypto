@@ -72,7 +72,7 @@ const AuthPage = () => {
 
                         {/* Overlay Left */}
                         <div className={`absolute top-0 flex flex-col items-center justify-center w-1/2 h-full px-12 text-center transition-transform duration-700 ease-in-out ${isSignUp ? 'translate-x-0' : '-translate-x-[20%]'}`}>
-                            <div className="p-4 bg-white/5 rounded-2xl mb-6 backdrop-blur-sm border border-white/10 shadow-xl">
+                            <div className="p-4 bg-white rounded-2xl mb-6 backdrop-blur-sm border border-white/10 shadow-xl">
                                 <img src={eVault_Logo} alt="Logo" className="h-36 object-contain" />
                             </div>
                             <h1 className="text-4xl font-bold mb-4 text-[#D4AF37]">Welcome Back!</h1>
@@ -89,7 +89,7 @@ const AuthPage = () => {
 
                         {/* Overlay Right */}
                         <div className={`absolute top-0 right-0 flex flex-col items-center justify-center w-1/2 h-full px-12 text-center transition-transform duration-700 ease-in-out ${isSignUp ? 'translate-x-[20%]' : 'translate-x-0'}`}>
-                            <div className="p-4 bg-white/5 rounded-2xl mb-6 backdrop-blur-sm border border-white/10 shadow-xl">
+                            <div className="p-4 bg-white rounded-2xl mb-6 backdrop-blur-sm border border-white/10 shadow-xl">
                                 <img src={eVault_Logo} alt="Logo" className="h-36 object-contain" />
                             </div>
                             <h1 className="text-4xl font-bold mb-4 text-[#D4AF37]">Hello, Friend!</h1>

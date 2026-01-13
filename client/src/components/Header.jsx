@@ -28,14 +28,14 @@ const Header = () => {
             >
                 <div className="container mx-auto px-6 h-16 flex items-center justify-between">
                     {/* Logo */}
-                    <div className="flex flex-col items-center -mt-10">
+                    <div className="flex flex-col items-center -mt-2 sm:-mt-10">
                         <img
                             src={eVault_Logo}
                             alt="eVault_Logo"
-                            className="block h-12 md:h-32 w-auto"
+                            className="block h-28 md:h-32 w-auto"
                         />
 
-                        <p className="text-xs z-10 font-bold text-[#D4AF37] -mt-10 text-center leading-none">
+                        <p className="text-xs z-10 font-bold text-[#D4AF37] -mt-8 sm:-mt-10 text-center leading-none">
                             Don't Just Hold... EARN!!!!
                         </p>
                     </div>
