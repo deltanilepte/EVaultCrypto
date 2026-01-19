@@ -16,7 +16,7 @@ const createInvestment = async (req, res) => {
             user: req.user._id,
             amount,
             method,
-            network: network || 'TRC', // Save network
+            network: method === 'USDT' ? (network || 'TRC') : undefined, // Save network only for USDT
             status: 'Pending',
             walletAddress: walletAddress || '',
             receiverWalletAddress: receiverWalletAddress || '',

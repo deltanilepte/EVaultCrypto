@@ -6,7 +6,9 @@ const configSchema = new mongoose.Schema({
         of: new mongoose.Schema({
             rate: Number,
             period: String,
-            walletAddress: { type: String, default: '' }
+            walletAddress: { type: String, default: '' },
+            walletAddressTRC: { type: String, default: '' },
+            walletAddressBEP: { type: String, default: '' }
         }),
         default: {}
     }

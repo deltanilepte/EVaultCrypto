@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useCrypto } from '../../context/CryptoContext';
-import { 
-    CheckCircleIcon, 
-    PencilSquareIcon, 
-    XMarkIcon, 
+import {
+    CheckCircleIcon,
+    PencilSquareIcon,
+    XMarkIcon,
     CheckIcon,
     WalletIcon,
     ChartBarIcon,
@@ -21,8 +21,10 @@ const TokenManagement = () => {
     const [editMode, setEditMode] = useState(null);
     const [tempRate, setTempRate] = useState('');
     const [tempWallet, setTempWallet] = useState('');
+    const [tempWalletTRC, setTempWalletTRC] = useState('');
+    const [tempWalletBEP, setTempWalletBEP] = useState('');
     const [message, setMessage] = useState('');
-    
+
     // Mock token icons and colors
     const tokenDetails = {
         USDT: { color: 'from-green-400 to-emerald-600', icon: '₮' },
@@ -37,12 +39,16 @@ const TokenManagement = () => {
         setEditMode(token);
         setTempRate(roiRates[token].rate);
         setTempWallet(roiRates[token].walletAddress || '');
+        setTempWalletTRC(roiRates[token].walletAddressTRC || '');
+        setTempWalletBEP(roiRates[token].walletAddressBEP || '');
     };
 
     const handleSave = (token) => {
         updateRoiRate(token, {
             rate: parseFloat(tempRate),
-            walletAddress: tempWallet
+            walletAddress: tempWallet,
+            walletAddressTRC: tempWalletTRC,
+            walletAddressBEP: tempWalletBEP
         });
         setEditMode(null);
         setMessage(`${token} configuration updated successfully!`);
@@ -55,7 +61,7 @@ const TokenManagement = () => {
 
     return (
         <div className="space-y-8 max-w-7xl mx-auto pb-12">
-            
+
             {/* Header with Gradient Background */}
             <div className="relative bg-gradient-to-r from-gray-900 to-gray-800 rounded-3xl shadow-2xl overflow-hidden">
                 <div className="absolute inset-0 bg-grid-white/5"></div>
@@ -72,7 +78,7 @@ const TokenManagement = () => {
                                 Manage global ROI rates and liquidity wallet destinations with real-time updates.
                             </p>
                         </div>
-                        
+
                         <div className="flex flex-col sm:flex-row gap-4">
                             <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl px-4 py-3 text-white">
                                 <div className="flex items-center gap-2">
@@ -83,7 +89,7 @@ const TokenManagement = () => {
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <div className="bg-gradient-to-r from-[#D4AF37]/20 to-[#FFD700]/10 border border-[#D4AF37]/30 rounded-xl px-4 py-3">
                                 <div className="flex items-center gap-2">
                                     <ClockIcon className="w-5 h-5 text-[#D4AF37]" />
@@ -112,7 +118,7 @@ const TokenManagement = () => {
                         </div>
                         <p className="text-green-900 font-semibold text-lg mt-1">{message}</p>
                     </div>
-                    <button 
+                    <button
                         onClick={() => setMessage('')}
                         className="p-1 hover:bg-green-500/20 rounded-lg transition-colors"
                     >
@@ -128,24 +134,22 @@ const TokenManagement = () => {
                     const tokenDetail = tokenDetails[token] || { color: 'from-gray-400 to-gray-600', icon: token[0] };
 
                     return (
-                        <div 
-                            key={token} 
-                            className={`relative group transition-all duration-500 ${
-                                isEditing 
-                                ? 'scale-[1.02] z-10' 
+                        <div
+                            key={token}
+                            className={`relative group transition-all duration-500 ${isEditing
+                                ? 'scale-[1.02] z-10'
                                 : 'hover:scale-[1.01]'
-                            }`}
+                                }`}
                         >
                             {/* Card Background */}
                             <div className={`absolute inset-0 bg-gradient-to-br ${tokenDetail.color} opacity-10 rounded-3xl blur-xl group-hover:opacity-20 transition-opacity duration-500`}></div>
-                            
+
                             {/* Main Card */}
-                            <div className={`relative bg-white/90 backdrop-blur-sm rounded-3xl overflow-hidden border-2 transition-all duration-300 ${
-                                isEditing 
-                                ? 'border-[#D4AF37] shadow-2xl' 
+                            <div className={`relative bg-white/90 backdrop-blur-sm rounded-3xl overflow-hidden border-2 transition-all duration-300 ${isEditing
+                                ? 'border-[#D4AF37] shadow-2xl'
                                 : 'border-gray-400 shadow-lg hover:shadow-xl hover:border-[#D4AF37]'
-                            }`}>
-                                
+                                }`}>
+
                                 {/* Card Header */}
                                 <div className="p-6 pb-0">
                                     <div className="flex items-center justify-between">
@@ -171,10 +175,10 @@ const TokenManagement = () => {
                                                 </div>
                                             </div>
                                         </div>
-                                        
+
                                         {/* Edit Button */}
                                         {!isEditing ? (
-                                            <button 
+                                            <button
                                                 onClick={() => handleEdit(token)}
                                                 className="p-2.5 text-gray-400 hover:text-[#D4AF37] hover:bg-[#D4AF37]/5 rounded-xl transition-all duration-300 group/btn"
                                             >
@@ -184,7 +188,7 @@ const TokenManagement = () => {
                                                 </div>
                                             </button>
                                         ) : (
-                                            <button 
+                                            <button
                                                 onClick={handleCancel}
                                                 className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors"
                                             >
@@ -197,9 +201,8 @@ const TokenManagement = () => {
                                 {/* Card Content */}
                                 <div className="p-6 pt-4 space-y-6">
                                     {/* ROI Section */}
-                                    <div className={`p-4 rounded-2xl transition-all duration-300 ${
-                                        isEditing ? 'bg-gradient-to-r from-gray-50 to-white ring-1 ring-gray-200' : 'bg-gradient-to-r from-gray-50/50 to-transparent'
-                                    }`}>
+                                    <div className={`p-4 rounded-2xl transition-all duration-300 ${isEditing ? 'bg-gradient-to-r from-gray-50 to-white ring-1 ring-gray-200' : 'bg-gradient-to-r from-gray-50/50 to-transparent'
+                                        }`}>
                                         <div className="flex items-center justify-between mb-3">
                                             <div className="flex items-center gap-2">
                                                 <div className="p-1.5 bg-gray-100 rounded-lg">
@@ -209,7 +212,7 @@ const TokenManagement = () => {
                                             </div>
                                             <InformationCircleIcon className="w-4 h-4 text-gray-400" />
                                         </div>
-                                        
+
                                         {isEditing ? (
                                             <div className="relative">
                                                 <input
@@ -241,37 +244,97 @@ const TokenManagement = () => {
                                             <span className="text-sm font-semibold text-gray-700">Sponsor Wallet Address</span>
                                         </div>
 
-                                        {isEditing ? (
-                                            <textarea
-                                                value={tempWallet}
-                                                onChange={(e) => setTempWallet(e.target.value)}
-                                                rows="2"
-                                                className="w-full text-sm font-mono bg-gray-50 border-2 border-gray-300 rounded-xl px-4 py-3 focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/20 outline-none transition-all resize-none placeholder-gray-400"
-                                                placeholder="0x0000...0000"
-                                            />
-                                        ) : (
-                                            <div className={`p-3 rounded-xl border transition-all duration-300 group/wallet ${
-                                                info.walletAddress 
-                                                ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-200 hover:border-green-300' 
-                                                : 'bg-gradient-to-r from-red-50 to-rose-50 border-red-200 hover:border-red-300'
-                                            }`}>
-                                                <div className="flex items-center gap-3">
-                                                    <div className={`p-2 rounded-lg ${
-                                                        info.walletAddress ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'
+                                        <div className="space-y-3">
+                                            {/* Default Wallet */}
+                                            {!isEditing && !info.walletAddressTRC && !info.walletAddressBEP && (
+                                                <div className={`p-3 rounded-xl border transition-all duration-300 group/wallet ${info.walletAddress
+                                                    ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-200 hover:border-green-300'
+                                                    : 'bg-gradient-to-r from-red-50 to-rose-50 border-red-200 hover:border-red-300'
                                                     }`}>
-                                                        <WalletIcon className="w-4 h-4" />
-                                                    </div>
-                                                    <div className="flex-1 min-w-0">
-                                                        <p className="text-xs font-mono text-gray-600 truncate">
-                                                            {info.walletAddress || 'Wallet not configured'}
-                                                        </p>
-                                                        <p className={`text-xs font-medium mt-1 ${
-                                                            info.walletAddress ? 'text-green-600' : 'text-red-500'
-                                                        }`}>
-                                                            {info.walletAddress ? 'Active & Verified' : 'Configuration Required'}
-                                                        </p>
+                                                    <div className="flex items-center gap-3">
+                                                        <div className={`p-2 rounded-lg ${info.walletAddress ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'
+                                                            }`}>
+                                                            <WalletIcon className="w-4 h-4" />
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <p className="text-xs font-mono text-gray-600 truncate">
+                                                                {info.walletAddress || 'Wallet not configured'}
+                                                            </p>
+                                                        </div>
                                                     </div>
                                                 </div>
+                                            )}
+
+                                            {/* TRC/BEP Display (Read Only) - ONLY FOR USDT */}
+                                            {!isEditing && token === 'USDT' && (info.walletAddressTRC || info.walletAddressBEP) && (
+                                                <>
+                                                    {info.walletAddressTRC && (
+                                                        <div className="p-3 rounded-xl border bg-gray-50 border-gray-200">
+                                                            <div className="flex items-center gap-2 mb-1">
+                                                                <span className="text-[10px] font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded">TRC20</span>
+                                                                <p className="text-xs font-mono text-gray-600 truncate flex-1">{info.walletAddressTRC}</p>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                    {info.walletAddressBEP && (
+                                                        <div className="p-3 rounded-xl border bg-gray-50 border-gray-200">
+                                                            <div className="flex items-center gap-2 mb-1">
+                                                                <span className="text-[10px] font-bold bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded">BEP20</span>
+                                                                <p className="text-xs font-mono text-gray-600 truncate flex-1">{info.walletAddressBEP}</p>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </>
+                                            )}
+                                        </div>
+
+
+                                        {isEditing && (
+                                            <div className="space-y-3">
+                                                {/* Generic/Default Wallet */}
+                                                <div>
+                                                    <label className="text-xs font-semibold text-gray-500 mb-1 block">Default Wallet</label>
+                                                    <textarea
+                                                        value={tempWallet}
+                                                        onChange={(e) => setTempWallet(e.target.value)}
+                                                        rows="1"
+                                                        className="w-full text-xs font-mono bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 focus:border-[#D4AF37] outline-none transition-all resize-none placeholder-gray-400"
+                                                        placeholder="Generic Address (Optional)"
+                                                    />
+                                                </div>
+
+                                                {/* TRC/BEP Wallets - ONLY FOR USDT */}
+                                                {token === 'USDT' && (
+                                                    <>
+                                                        {/* TRC Wallet */}
+                                                        <div>
+                                                            <label className="text-xs font-semibold text-gray-500 mb-1 block flex items-center gap-2">
+                                                                <span className="w-2 h-2 rounded-full bg-red-500"></span> TRC20 Wallet
+                                                            </label>
+                                                            <textarea
+                                                                value={tempWalletTRC}
+                                                                onChange={(e) => setTempWalletTRC(e.target.value)}
+                                                                rows="1"
+                                                                className="w-full text-xs font-mono bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 focus:border-[#D4AF37] outline-none transition-all resize-none placeholder-gray-400"
+                                                                placeholder="T-Address..."
+                                                            />
+                                                        </div>
+
+                                                        {/* BEP Wallet */}
+                                                        <div>
+                                                            <label className="text-xs font-semibold text-gray-500 mb-1 block flex items-center gap-2">
+                                                                <span className="w-2 h-2 rounded-full bg-yellow-500"></span> BEP20 Wallet
+                                                            </label>
+                                                            <textarea
+                                                                value={tempWalletBEP}
+                                                                onChange={(e) => setTempWalletBEP(e.target.value)}
+                                                                rows="1"
+                                                                className="w-full text-xs font-mono bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 focus:border-[#D4AF37] outline-none transition-all resize-none placeholder-gray-400"
+                                                                placeholder="0x-Address..."
+                                                            />
+                                                        </div>
+                                                    </>
+                                                )}
                                             </div>
                                         )}
                                     </div>
@@ -281,13 +344,13 @@ const TokenManagement = () => {
                                 {isEditing && (
                                     <div className="p-6 pt-0">
                                         <div className="flex items-center gap-3">
-                                            <button 
+                                            <button
                                                 onClick={handleCancel}
                                                 className="flex-1 py-3 rounded-xl text-sm font-bold text-gray-600 hover:bg-gray-100 transition-all duration-300 border border-gray-300 hover:border-gray-400"
                                             >
                                                 Cancel
                                             </button>
-                                            <button 
+                                            <button
                                                 onClick={() => handleSave(token)}
                                                 className="flex-1 py-3 rounded-xl bg-gradient-to-r from-gray-900 to-gray-800 text-white text-sm font-bold hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 shadow-md"
                                             >

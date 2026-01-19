@@ -90,12 +90,21 @@ const Investments = () => {
         const rateObj = roiRates?.[selectedMethod];
         const adminWallet = rateObj?.walletAddress;
 
-        console.log("Investments Debug - Selected:", selectedMethod);
-        console.log("Investments Debug - RateObj:", rateObj);
-        console.log("Investments Debug - AdminWallet:", adminWallet);
+        // Check for specific Network Wallets if available
+        let specificWallet = adminWallet;
+        if (network === 'TRC' && rateObj?.walletAddressTRC) {
+            specificWallet = rateObj.walletAddressTRC;
+        } else if (network === 'BEP' && rateObj?.walletAddressBEP) {
+            specificWallet = rateObj.walletAddressBEP;
+        }
 
-        if (adminWallet) {
-            setReceiverWalletAddress(adminWallet);
+        console.log("Investments Debug - Selected:", selectedMethod);
+        console.log("Investments Debug - Network:", network);
+        console.log("Investments Debug - RateObj:", rateObj);
+        console.log("Investments Debug - SpecificWallet:", specificWallet);
+
+        if (specificWallet) {
+            setReceiverWalletAddress(specificWallet);
             return;
         }
 
@@ -114,7 +123,7 @@ const Investments = () => {
         // 3. Keep empty if no data
         setReceiverWalletAddress('');
 
-    }, [selectedMethod, investments, roiRates]);
+    }, [selectedMethod, investments, roiRates, network]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -214,32 +223,49 @@ const Investments = () => {
 
 
                             {/* Network Selection */}
-                            <div className="space-y-4">
-                                <label className="block text-sm font-semibold text-gray-700">Select Network</label>
-                                <div className="grid grid-cols-2 gap-4">
-                                    {['TRC', 'BEP'].map((net) => (
-                                        <div
-                                            key={net}
-                                            onClick={() => setNetwork(net)}
-                                            className={`cursor-pointer rounded-xl p-4 border flex items-center gap-3 transition-all ${network === net
-                                                ? 'bg-gray-900 border-gray-900 text-white shadow-lg'
-                                                : 'bg-white border-gray-200 text-gray-700 hover:border-[#D4AF37]'
-                                                }`}
-                                        >
-                                            <div className={`w-5 h-5 rounded-full border flex items-center justify-center ${network === net ? 'border-[#D4AF37]' : 'border-gray-400'
-                                                }`}>
-                                                {network === net && <div className="w-2.5 h-2.5 rounded-full bg-[#D4AF37]"></div>}
-                                            </div>
-                                            <div>
-                                                <p className="font-bold">{net}</p>
-                                                <p className={`text-xs ${network === net ? 'text-gray-400' : 'text-gray-500'}`}>
-                                                    {net === 'TRC' ? 'Tron Network (TRC20)' : 'BNB Smart Chain (BEP20)'}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    ))}
+                            {/* Network Selection - ONLY FOR USDT */}
+                            {selectedMethod === 'USDT' && (
+                                <div className="space-y-4">
+                                    <label className="block text-sm font-semibold text-gray-700">Select Network</label>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        {['TRC', 'BEP'].map((net) => {
+                                            const rateObj = roiRates?.[selectedMethod];
+                                            const netWallet = net === 'TRC' ? rateObj?.walletAddressTRC : rateObj?.walletAddressBEP;
+
+                                            return (
+                                                <div
+                                                    key={net}
+                                                    onClick={() => setNetwork(net)}
+                                                    className={`cursor-pointer rounded-xl p-4 border flex flex-col gap-2 transition-all ${network === net
+                                                        ? 'bg-gray-900 border-gray-900 text-white shadow-lg'
+                                                        : 'bg-white border-gray-200 text-gray-700 hover:border-[#D4AF37]'
+                                                        }`}
+                                                >
+                                                    <div className="flex items-center gap-3">
+                                                        <div className={`w-5 h-5 rounded-full border flex items-center justify-center ${network === net ? 'border-[#D4AF37]' : 'border-gray-400'
+                                                            }`}>
+                                                            {network === net && <div className="w-2.5 h-2.5 rounded-full bg-[#D4AF37]"></div>}
+                                                        </div>
+                                                        <div>
+                                                            <p className="font-bold">{net}</p>
+                                                            <p className={`text-xs ${network === net ? 'text-gray-400' : 'text-gray-500'}`}>
+                                                                {net === 'TRC' ? 'Tron Network (TRC20)' : 'BNB Smart Chain (BEP20)'}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Show Wallet Address if Selected */}
+                                                    {network === net && netWallet && (
+                                                        <div className="mt-2 text-[10px] font-mono bg-white/10 p-2 rounded border border-white/20 text-gray-300 break-all">
+                                                            {netWallet}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
                                 </div>
-                            </div>
+                            )}
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {/* Sender Wallet Address (Read-Only) */}

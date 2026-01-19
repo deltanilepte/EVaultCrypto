@@ -204,6 +204,7 @@ const InvestmentRequests = () => {
                                     <tr>
                                         <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Req ID</th>
                                         <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">User</th>
+                                        <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Hash</th>
                                         <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Wallets</th>
                                         <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Amount</th>
                                         <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Method</th>
@@ -229,6 +230,21 @@ const InvestmentRequests = () => {
                                                         <div className="font-semibold text-gray-900">{req.user?.name || req.user}</div>
                                                         <div className="text-xs text-gray-500">Requester</div>
                                                     </div>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="flex items-center gap-2 group/hash relative">
+                                                    <div className="font-mono text-xs bg-gray-50 border border-gray-200 rounded px-2 py-1 text-gray-600 max-w-[100px] truncate cursor-pointer hover:bg-gray-100 hover:text-blue-600 hover:border-blue-200 transition-colors"
+                                                        onClick={() => navigator.clipboard.writeText(req.transactionHash || '')}
+                                                        title="Click to copy full hash"
+                                                    >
+                                                        {req.transactionHash ? `${req.transactionHash.slice(0, 6)}...${req.transactionHash.slice(-4)}` : '-'}
+                                                    </div>
+                                                    {req.transactionHash && (
+                                                        <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[10px] py-1 px-2 rounded opacity-0 group-hover/hash:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
+                                                            {req.transactionHash}
+                                                        </span>
+                                                    )}
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4">
@@ -363,6 +379,7 @@ const InvestmentRequests = () => {
                                 <tr>
                                     <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Req ID</th>
                                     <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">User</th>
+                                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Hash</th>
                                     <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Amount</th>
                                     <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Method</th>
                                     <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Network</th>
@@ -387,6 +404,21 @@ const InvestmentRequests = () => {
                                                     <div className="font-semibold text-gray-900">{req.user?.name || req.user}</div>
                                                     <div className="text-xs text-gray-500">Investor</div>
                                                 </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center gap-2 group/hash relative">
+                                                <div className="font-mono text-xs bg-gray-50 border border-gray-200 rounded px-2 py-1 text-gray-600 max-w-[100px] truncate cursor-pointer hover:bg-gray-100 hover:text-blue-600 hover:border-blue-200 transition-colors"
+                                                    onClick={() => navigator.clipboard.writeText(req.transactionHash || '')}
+                                                    title="Click to copy full hash"
+                                                >
+                                                    {req.transactionHash ? `${req.transactionHash.slice(0, 6)}...${req.transactionHash.slice(-4)}` : '-'}
+                                                </div>
+                                                {req.transactionHash && (
+                                                    <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[10px] py-1 px-2 rounded opacity-0 group-hover/hash:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
+                                                        {req.transactionHash}
+                                                    </span>
+                                                )}
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
