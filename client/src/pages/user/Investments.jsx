@@ -255,11 +255,11 @@ const Investments = () => {
                                                     </div>
 
                                                     {/* Show Wallet Address if Selected */}
-                                                    {network === net && netWallet && (
+                                                    {/* {network === net && netWallet && (
                                                         <div className="mt-2 text-[10px] font-mono bg-white/10 p-2 rounded border border-white/20 text-gray-300 break-all">
                                                             {netWallet}
                                                         </div>
-                                                    )}
+                                                    )} */}
                                                 </div>
                                             );
                                         })}
