@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, User, CheckCircle2 } from 'lucide-react';
-import eVault_Logo from '../../public/evaultbg.png';
+const eVault_Logo = '/evaultbg.png';
 
 import { useCrypto } from '../context/CryptoContext';
 
@@ -211,7 +211,8 @@ const SignUpForm = ({ toggleMode }) => {
         setLoading(true);
         const res = await register(name, email, password);
         if (res.success) {
-            navigate('/dashboard');
+            alert(res.message || 'Registration successful! Please verify your email.');
+            navigate('/login');
         } else {
             alert(res.message || 'Registration failed');
         }

@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Shield, Globe, Zap, CheckCircle2, ArrowRight } from 'lucide-react';
-import eVaultLogo from '../../public/evaultbg.png';
+const eVaultLogo = '/evaultbg.png';
 import { useNavigate } from 'react-router-dom';
 
 const AboutUs = () => {

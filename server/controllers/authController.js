@@ -312,28 +312,43 @@ const toggleUserBlockStatus = async (req, res) => {
 // @access  Public
 const verifyEmail = async (req, res) => {
     try {
+        console.log("Verifying email with token:", req.params.token);
         const verificationToken = crypto
             .createHash('sha256')
             .update(req.params.token)
             .digest('hex');
 
+        console.log("Hashed token:", verificationToken);
+
         const user = await User.findOne({
-            verificationToken,
-            verificationTokenExpire: { $gt: Date.now() },
+            verificationToken
         });
 
         if (!user) {
-            return res.status(400).json({ message: 'Invalid or expired token' });
+            console.log("No user found with this hash:", verificationToken);
+            return res.status(400).json({
+                message: 'Invalid token (User not found with this hash)',
+                debugHash: verificationToken
+            });
         }
+
+        if (user.verificationTokenExpire < Date.now()) {
+            console.log("Token expired. Expiry:", user.verificationTokenExpire, "Now:", Date.now());
+            return res.status(400).json({ message: 'Token expired' });
+        }
+
+        console.log("User found:", user.email);
 
         user.isVerified = true;
         user.verificationToken = undefined;
         user.verificationTokenExpire = undefined;
 
         await user.save();
+        console.log("User verified successfully.");
 
         res.status(200).json({ success: true, message: 'Email verified successfully! You can now login.' });
     } catch (error) {
+        console.error("Verification error:", error);
         res.status(500).json({ message: error.message });
     }
 };

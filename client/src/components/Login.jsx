@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
-import eVault_Logo from '../../public/evaultbg.png';
+const eVault_Logo = '/evaultbg.png';
 import { useCrypto } from '../context/CryptoContext';
 import { useNavigate } from 'react-router-dom';
 
