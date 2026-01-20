@@ -76,9 +76,14 @@ export const CryptoProvider = ({ children }) => {
 
     const fetchUserData = async () => {
         try {
-            const invRes = await api.get('/investments');
+            const [profileRes, invRes, txRes] = await Promise.all([
+                api.get('/auth/profile'),
+                api.get('/investments'),
+                api.get('/transactions')
+            ]);
+
+            setUser(prev => ({ ...prev, ...profileRes.data }));
             setInvestments(invRes.data);
-            const txRes = await api.get('/transactions');
             setWithdrawals(txRes.data.filter(tx => tx.type === 'Withdrawal'));
         } catch (err) {
             console.error('Error fetching user data', err);

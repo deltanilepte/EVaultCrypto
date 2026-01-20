@@ -50,7 +50,11 @@ const StatCard = ({ title, value, subtext, icon: Icon, gradient, delay }) => (
 );
 
 const UserDashboard = () => {
-    const { user, investments, roiRates } = useCrypto();
+    const { user, investments, roiRates, fetchUserData } = useCrypto();
+
+    React.useEffect(() => {
+        fetchUserData();
+    }, []);
 
     const totalActiveInvestments = (investments || []).filter(i => i.status === 'Active').length;
 
