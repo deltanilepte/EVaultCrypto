@@ -17,7 +17,7 @@ import {
 } from '@heroicons/react/24/outline';
 
 const TokenManagement = () => {
-    const { roiRates, updateRoiRate } = useCrypto();
+    const { roiRates, updateRoiRate, lastUpdatedConfig } = useCrypto();
     const [editMode, setEditMode] = useState(null);
     const [tempRate, setTempRate] = useState('');
     const [tempWallet, setTempWallet] = useState('');
@@ -95,7 +95,9 @@ const TokenManagement = () => {
                                     <ClockIcon className="w-5 h-5 text-[#D4AF37]" />
                                     <div>
                                         <p className="text-sm font-medium text-[#D4AF37]">Last Updated</p>
-                                        <p className="text-sm font-bold text-white">Just now</p>
+                                        <p className="text-sm font-bold text-white">
+                                            {lastUpdatedConfig ? lastUpdatedConfig.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Loading...'}
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -241,7 +243,7 @@ const TokenManagement = () => {
                                             <div className="p-1.5 bg-gray-100 rounded-lg">
                                                 <WalletIcon className="w-4 h-4 text-gray-600" />
                                             </div>
-                                            <span className="text-sm font-semibold text-gray-700">Sponsor Wallet Address</span>
+                                            <span className="text-sm font-semibold text-gray-700">Receiver Wallet Address</span>
                                         </div>
 
                                         <div className="space-y-3">

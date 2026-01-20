@@ -22,8 +22,10 @@ import {
 import {
     BanknotesIcon,
     ChartBarIcon,
-    FireIcon
+    FireIcon,
+    QrCodeIcon
 } from '@heroicons/react/24/outline';
+import QRCode from 'react-qr-code';
 import api from '../../api/axios';
 
 const WithdrawalRequests = () => {
@@ -39,6 +41,7 @@ const WithdrawalRequests = () => {
     const [currentHistoryPage, setCurrentHistoryPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
     const [copiedAddress, setCopiedAddress] = useState('');
+    const [viewQr, setViewQr] = useState(null);
 
     // Fetch withdrawals from API
     const fetchWithdrawals = async () => {
@@ -469,6 +472,13 @@ const WithdrawalRequests = () => {
                                                 >
                                                     <DocumentDuplicateIcon className="w-3 h-3" />
                                                 </button>
+                                                <button
+                                                    onClick={() => setViewQr(req.address)}
+                                                    className="p-1 text-gray-400 hover:text-[#D4AF37] opacity-0 group-hover:opacity-100 transition-all"
+                                                    title="View QR Code"
+                                                >
+                                                    <QrCodeIcon className="w-3 h-3" />
+                                                </button>
                                             </div>
                                             {copiedAddress === req.address && (
                                                 <div className="text-xs text-green-600 mt-1 font-medium animate-fade-in">
@@ -561,6 +571,44 @@ const WithdrawalRequests = () => {
                     )}
                 </div>
             </div>
+            {/* QR Code Modal */}
+            {viewQr && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+                    <div
+                        className="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl transform transition-all scale-100 animate-scale-up relative"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <button
+                            onClick={() => setViewQr(null)}
+                            className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+                        >
+                            <XMarkIcon className="w-6 h-6" />
+                        </button>
+
+                        <div className="text-center mb-6">
+                            <h3 className="text-xl font-bold text-gray-900 mb-2">Wallet Address</h3>
+                            <p className="text-xs font-mono text-gray-500 break-all bg-gray-50 p-2 rounded-lg border border-gray-100">
+                                {viewQr}
+                            </p>
+                        </div>
+
+                        <div className="flex justify-center p-4 bg-white rounded-2xl border-2 border-dashed border-gray-200">
+                            <QRCode
+                                value={viewQr}
+                                size={200}
+                                style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+                                viewBox={`0 0 256 256`}
+                            />
+                        </div>
+
+                        <div className="mt-6 text-center">
+                            <p className="text-sm text-gray-400">Scan to copy address</p>
+                        </div>
+                    </div>
+                    {/* Click outside to close */}
+                    <div className="absolute inset-0 z-[-1]" onClick={() => setViewQr(null)}></div>
+                </div>
+            )}
         </div>
     );
 };

@@ -199,7 +199,10 @@ const Withdrawals = () => {
 
                                 {/* Wallet Address Input */}
                                 <div className="space-y-2">
-                                    <label className="text-sm font-semibold text-gray-700">Wallet Address</label>
+                                    <label className="text-sm font-semibold text-gray-700 flex justify-between items-center">
+                                        <span>Wallet Address</span>
+                                        <span className="text-[10px] font-bold text-yellow-700 bg-yellow-100 px-2 py-0.5 rounded border border-yellow-200">BEP20</span>
+                                    </label>
                                     <div className="relative">
                                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                             <WalletIcon className="h-5 w-5 text-gray-400" />

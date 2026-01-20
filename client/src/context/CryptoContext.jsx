@@ -27,6 +27,7 @@ export const CryptoProvider = ({ children }) => {
         BNB: { rate: 2.91, period: 'Monthly', walletAddress: '' },
         BTC: { rate: 3.1, period: 'Monthly', walletAddress: '' },
     });
+    const [lastUpdatedConfig, setLastUpdatedConfig] = useState(null);
 
 
 
@@ -43,6 +44,9 @@ export const CryptoProvider = ({ children }) => {
                         ...prev,
                         ...rates
                     }));
+                    if (data.lastUpdated) {
+                        setLastUpdatedConfig(new Date(data.lastUpdated));
+                    }
                 }
             } catch (err) {
                 console.error("Failed to load config", err);
@@ -129,13 +133,11 @@ export const CryptoProvider = ({ children }) => {
     const register = async (name, email, password) => {
         try {
             const { data } = await api.post('/auth/register', { name, email, password });
-            localStorage.setItem('evault_token', data.token);
-            setUser(data);
-            fetchUserData();
-            return { success: true };
+            // Do NOT login automatically. Return success message.
+            return { success: true, message: data.message };
         } catch (err) {
             setError(err.response?.data?.message || 'Registration failed');
-            return { success: false, message: err.response?.data?.message };
+            return { success: false, message: err.response?.data?.message }; // Fixed typo 'reponse'
         }
     };
 
@@ -283,6 +285,7 @@ export const CryptoProvider = ({ children }) => {
                     [token]: updates
                 }
             });
+            setLastUpdatedConfig(new Date()); // Optimistic update of timestamp
         } catch (err) {
             console.error("Failed to save ROI config", err);
             // Optionally revert state here if critical
@@ -295,6 +298,7 @@ export const CryptoProvider = ({ children }) => {
             loading,
             error,
             roiRates,
+            lastUpdatedConfig,
             investments,
             withdrawals,
             investmentRequests,

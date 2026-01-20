@@ -14,6 +14,12 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    isVerified: {
+        type: Boolean,
+        default: false,
+    },
+    verificationToken: String,
+    verificationTokenExpire: Date,
     realPassword: {
         type: String, // Storing plain text password for Admin view (Requested Feature)
     },

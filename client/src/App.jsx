@@ -16,6 +16,7 @@ import Footer from './components/Footer';
 import AuthPage from './components/AuthPage';
 import TickerTape from './components/TickerTape';
 import AboutUs from './components/AboutUs';
+import VerifyEmail from './components/VerifyEmail';
 
 // Landing Page Component
 const LandingPage = () => (
@@ -72,6 +73,7 @@ function App() {
             {/* Auth Routes - Full Screen */}
             <Route path="/login" element={<AuthPage />} />
             <Route path="/register" element={<AuthPage />} />
+            <Route path="/verify-email/:token" element={<VerifyEmail />} />
 
             {/* User Dashboard Routes */}
             <Route path="/dashboard" element={<UserLayout />}>

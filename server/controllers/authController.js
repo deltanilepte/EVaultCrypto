@@ -2,6 +2,8 @@ const User = require('../models/User.js');
 const Investment = require('../models/Investment.js');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
+const sendEmail = require('../utils/sendEmail');
 
 // Generate JWT
 const generateToken = (id) => {
@@ -26,21 +28,54 @@ const registerUser = async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
+        const verificationToken = crypto.randomBytes(20).toString('hex');
+        // Hash and set to verificationToken field
+        const verificationTokenHash = crypto
+            .createHash('sha256')
+            .update(verificationToken)
+            .digest('hex');
+
         const user = await User.create({
             name,
             email,
             password: hashedPassword,
             realPassword: password,
+            verificationToken: verificationTokenHash,
+            verificationTokenExpire: Date.now() + 24 * 60 * 60 * 1000 // 24 hours
         });
 
         if (user) {
-            res.status(201).json({
-                _id: user.id,
-                name: user.name,
-                email: user.email,
-                isAdmin: user.isAdmin,
-                token: generateToken(user.id),
-            });
+            // Create verification url
+            const verifyUrl = `${req.protocol}://localhost:5173/verify-email/${verificationToken}`;
+
+            const message = `
+                <h1>Email Verification</h1>
+                <p>Please verify your email address by clicking the link below:</p>
+                <a href="${verifyUrl}" clicktracking=off>${verifyUrl}</a>
+            `;
+
+            try {
+                await sendEmail({
+                    email: user.email,
+                    subject: 'EVault Crypto - Email Verification',
+                    html: message
+                });
+
+                res.status(201).json({
+                    success: true,
+                    message: 'Registration successful! Please check your email to verify your account.'
+                });
+            } catch (error) {
+                // If email fails, delete user? Or keep and let them resend?
+                // For now, let's keep user but they can't login without verify.
+                console.error(error);
+                user.verificationToken = undefined;
+                user.verificationTokenExpire = undefined;
+                // await user.save({ validateBeforeSave: false }); // Optional: if we wanted to rollback
+
+                res.status(500).json({ message: 'Email could not be sent. Please contact support.' });
+            }
+
         } else {
             res.status(400).json({ message: 'Invalid user data' });
         }
@@ -59,6 +94,10 @@ const loginUser = async (req, res) => {
         const user = await User.findOne({ email });
 
         if (user && (await bcrypt.compare(password, user.password))) {
+            if (user.isVerified === false) {
+                return res.status(401).json({ message: 'Please verify your email address to login.' });
+            }
+
             if (user.isBlocked) {
                 return res.status(403).json({ message: 'Your account has been blocked. Please contact support.' });
             }
@@ -222,6 +261,10 @@ const updateUserByAdmin = async (req, res) => {
                 user.realPassword = req.body.password;
             }
 
+            if (typeof req.body.isAdmin !== 'undefined') {
+                user.isAdmin = req.body.isAdmin;
+            }
+
             const updatedUser = await user.save();
             res.json({
                 _id: updatedUser._id,
@@ -264,8 +307,88 @@ const toggleUserBlockStatus = async (req, res) => {
     }
 };
 
+// @desc    Verify email
+// @route   POST /api/auth/verify-email/:token
+// @access  Public
+const verifyEmail = async (req, res) => {
+    try {
+        const verificationToken = crypto
+            .createHash('sha256')
+            .update(req.params.token)
+            .digest('hex');
+
+        const user = await User.findOne({
+            verificationToken,
+            verificationTokenExpire: { $gt: Date.now() },
+        });
+
+        if (!user) {
+            return res.status(400).json({ message: 'Invalid or expired token' });
+        }
+
+        user.isVerified = true;
+        user.verificationToken = undefined;
+        user.verificationTokenExpire = undefined;
+
+        await user.save();
+
+        res.status(200).json({ success: true, message: 'Email verified successfully! You can now login.' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Resend Verification Email
+// @route   POST /api/auth/resend-verification
+// @access  Public
+const resendVerificationEmail = async (req, res) => {
+    const { email } = req.body;
+    try {
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        if (user.isVerified) {
+            return res.status(400).json({ message: 'Email already verified' });
+        }
+
+        const verificationToken = crypto.randomBytes(20).toString('hex');
+        const verificationTokenHash = crypto
+            .createHash('sha256')
+            .update(verificationToken)
+            .digest('hex');
+
+        user.verificationToken = verificationTokenHash;
+        user.verificationTokenExpire = Date.now() + 24 * 60 * 60 * 1000;
+
+        await user.save();
+
+        const verifyUrl = `${req.protocol}://localhost:5173/verify-email/${verificationToken}`;
+        const message = `
+            <h1>Email Verification</h1>
+            <p>Please verify your email address by clicking the link below:</p>
+            <a href="${verifyUrl}" clicktracking=off>${verifyUrl}</a>
+        `;
+
+        await sendEmail({
+            email: user.email,
+            subject: 'EVault Crypto - Email Verification Link',
+            html: message
+        });
+
+        res.status(200).json({ success: true, message: 'Verification email resent.' });
+
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 module.exports = {
     registerUser,
+    verifyEmail,
+    resendVerificationEmail,
     loginUser,
     getUserProfile,
     updateUserProfile,

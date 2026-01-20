@@ -18,7 +18,8 @@ import {
     ArrowDownTrayIcon,
     PencilSquareIcon,
     CheckIcon,
-    XMarkIcon
+    XMarkIcon,
+    ShieldCheckIcon
 } from '@heroicons/react/24/outline';
 
 import api from '../../api/axios';
@@ -82,6 +83,22 @@ const UserManagement = () => {
         } catch (error) {
             console.error("Failed to toggle block status", error);
             alert("Failed to update user status");
+        }
+    };
+
+    // Toggle Admin Status
+    const toggleAdminStatus = async (id, currentStatus) => {
+        const action = currentStatus ? 'revoke Admin rights from' : 'promote to Admin';
+        if (window.confirm(`Are you sure you want to ${action} this user?`)) {
+            try {
+                const { data } = await api.put(`/auth/users/${id}`, { isAdmin: !currentStatus });
+                setUsers(prev => prev.map(user =>
+                    user._id === id ? { ...user, isAdmin: data.isAdmin } : user
+                ));
+            } catch (error) {
+                console.error("Failed to update role", error);
+                alert("Failed to update user role");
+            }
         }
     };
 
@@ -212,6 +229,12 @@ const UserManagement = () => {
                                 </th>
                                 <th className="px-6 py-4 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">
                                     <div className="flex items-center gap-2">
+                                        <ShieldCheckIcon className="w-4 h-4" />
+                                        <span>Role</span>
+                                    </div>
+                                </th>
+                                <th className="px-6 py-4 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                                    <div className="flex items-center gap-2">
                                         <EnvelopeIcon className="w-4 h-4" />
                                         <span>Email</span>
                                     </div>
@@ -280,6 +303,18 @@ const UserManagement = () => {
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <div className="text-sm text-gray-900">{user.email}</div>
                                             <div className="text-xs text-gray-500">{formatDate(user.joinDate)}</div>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <button
+                                                onClick={() => toggleAdminStatus(user._id, user.isAdmin)}
+                                                className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold border transition-all ${user.isAdmin
+                                                    ? 'bg-purple-100 text-purple-700 border-purple-200 hover:bg-purple-200'
+                                                    : 'bg-gray-100 text-gray-500 border-gray-200 hover:bg-gray-200'
+                                                    }`}
+                                            >
+                                                <ShieldCheckIcon className="w-3 h-3" />
+                                                {user.isAdmin ? 'ADMIN' : 'USER'}
+                                            </button>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <div className="flex items-center gap-2">

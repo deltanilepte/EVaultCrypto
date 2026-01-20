@@ -11,6 +11,10 @@ const configSchema = new mongoose.Schema({
             walletAddressBEP: { type: String, default: '' }
         }),
         default: {}
+    },
+    lastUpdated: {
+        type: Date,
+        default: Date.now
     }
 }, { timestamps: true });
 

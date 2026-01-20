@@ -43,6 +43,7 @@ router.put('/', protect, admin, async (req, res) => {
             });
         }
 
+        config.lastUpdated = Date.now();
         await config.save();
         res.json(config);
     } catch (error) {
