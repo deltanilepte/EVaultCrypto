@@ -129,14 +129,7 @@ const getUserProfile = async (req, res) => {
     try {
         const user = await User.findById(req.user.id).select('-password');
         if (user) {
-            // Calculate Total Invested dynamically
-            const investments = await Investment.find({ user: req.user.id });
-            const totalInvested = investments.reduce((acc, inv) => acc + (inv.amount || 0), 0);
-
-            const userObj = user.toObject();
-            userObj.totalInvested = totalInvested;
-
-            res.json(userObj);
+            res.json(user);
         } else {
             res.status(404).json({ message: 'User not found' });
         }
@@ -165,17 +158,7 @@ const getUsers = async (req, res) => {
 
         const users = await User.find(query);
 
-        // Aggregate investments for each user
-        const usersWithInvestments = await Promise.all(users.map(async (user) => {
-            const investments = await Investment.find({ user: user._id });
-            const totalInvested = investments.reduce((acc, inv) => acc + (inv.amount || 0), 0);
-
-            const userObj = user.toObject();
-            userObj.totalInvested = totalInvested;
-            return userObj;
-        }));
-
-        res.json(usersWithInvestments);
+        res.json(users);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
