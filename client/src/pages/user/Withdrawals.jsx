@@ -136,7 +136,7 @@ const Withdrawals = () => {
                                             .reduce((sum, inv) => sum + (inv.totalClaimed || 0), 0);
 
                                         const totalWithdrawn = withdrawals
-                                            .filter(w => w.method === token && w.status !== 'Rejected')
+                                            .filter(w => w.method === token && w.status !== 'Rejected' && !w.isSos)
                                             .reduce((sum, w) => sum + w.amount, 0);
 
                                         const assetBalance = Math.max(0, totalClaimed - totalWithdrawn);

@@ -73,6 +73,21 @@ const WithdrawalRequests = () => {
         }
     };
 
+    // Action Handlers
+    const handleApprove = async (id) => {
+        if (window.confirm('Approve this withdrawal?')) {
+            await approveWithdrawal(id);
+            fetchWithdrawals();
+        }
+    };
+
+    const handleReject = async (id) => {
+        if (window.confirm('Reject this withdrawal?')) {
+            await rejectWithdrawal(id);
+            fetchWithdrawals();
+        }
+    };
+
     // Copy address to clipboard
     const copyToClipboard = (text) => {
         if (!text) return;
@@ -288,13 +303,22 @@ const WithdrawalRequests = () => {
                                                             <span className="text-sm font-mono text-gray-700 truncate">
                                                                 {req.address}
                                                             </span>
-                                                            <button
-                                                                onClick={() => copyToClipboard(req.address)}
-                                                                className="p-1.5 text-gray-400 hover:text-[#D4AF37] hover:bg-gray-100 rounded-lg transition-colors"
-                                                                title="Copy address"
-                                                            >
-                                                                <DocumentDuplicateIcon className="w-4 h-4" />
-                                                            </button>
+                                                            <div className="flex items-center gap-1">
+                                                                <button
+                                                                    onClick={() => setViewQr(req.address)}
+                                                                    className="p-1 text-gray-400 hover:text-[#D4AF37] hover:bg-gray-100 rounded-lg transition-colors"
+                                                                    title="View QR Code"
+                                                                >
+                                                                    <QrCodeIcon className="w-4 h-4" />
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => copyToClipboard(req.address)}
+                                                                    className="p-1.5 text-gray-400 hover:text-[#D4AF37] hover:bg-gray-100 rounded-lg transition-colors"
+                                                                    title="Copy address"
+                                                                >
+                                                                    <DocumentDuplicateIcon className="w-4 h-4" />
+                                                                </button>
+                                                            </div>
                                                         </div>
                                                         {copiedAddress === req.address && (
                                                             <div className="text-xs text-green-600 mt-1 font-medium animate-fade-in">
