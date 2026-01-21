@@ -27,7 +27,10 @@ const Withdrawals = () => {
 
     // Helper to calculate max amount
     const handleMaxClick = () => {
-        if (user) setAmount(user.balance.toString());
+        if (user) {
+            const maxVal = isSos ? (user.totalInvested || 0) : user.balance;
+            setAmount(maxVal.toString());
+        }
     };
 
     if (loading || !user) {
@@ -49,9 +52,18 @@ const Withdrawals = () => {
             return;
         }
 
-        if (amount > user.balance) {
-            setError('Insufficient available balance.');
-            return;
+        if (isSos) {
+            // Validate against totalInvested
+            if (amount > (user.totalInvested || 0)) {
+                setError('Insufficient active investment balance for SOS.');
+                return;
+            }
+        } else {
+            // Validate against wallet balance
+            if (amount > user.balance) {
+                setError('Insufficient available balance.');
+                return;
+            }
         }
 
         if (!walletAddress) {
@@ -183,7 +195,7 @@ const Withdrawals = () => {
                                             type="number"
                                             value={amount}
                                             onChange={e => setAmount(e.target.value)}
-                                            max={user.balance}
+                                            max={isSos ? (user.totalInvested || 0) : user.balance}
                                             className="block w-full pl-10 pr-16 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent transition-all bg-gray-50 focus:bg-white font-medium"
                                             placeholder="0.00"
                                         />

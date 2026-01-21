@@ -107,6 +107,13 @@ const updateInvestment = async (req, res) => {
             if (status === 'Active' && investment.status !== 'Active') {
                 investment.startDate = Date.now();
                 investment.lastClaimedAt = Date.now(); // Reset claim timer on activation
+
+                // Update User Total Invested
+                const user = await User.findById(investment.user);
+                if (user) {
+                    user.totalInvested += investment.amount;
+                    await user.save();
+                }
             }
 
             const updatedInvestment = await investment.save();
@@ -177,8 +184,8 @@ const claimInvestmentROI = async (req, res) => {
 
         // Update User Balance
         const user = await User.findById(req.user.id);
-        user.balance += claimableAmount;
-        user.totalROI += claimableAmount;
+        user.balance = Number(user.balance) + Number(claimableAmount);
+        user.totalROI = Number(user.totalROI) + Number(claimableAmount);
         await user.save();
 
         // Create Transaction

@@ -1,5 +1,6 @@
 const Transaction = require('../models/Transaction.js');
 const User = require('../models/User.js');
+const Investment = require('../models/Investment.js');
 
 // @desc    Request a withdrawal
 // @route   POST /api/transactions/withdraw
@@ -7,17 +8,45 @@ const User = require('../models/User.js');
 const requestWithdrawal = async (req, res) => {
     const { amount, method, address, walletAddress, isSos } = req.body;
 
+    // Strict number conversion
+    const amountNum = Number(amount);
+
+    if (isNaN(amountNum) || amountNum <= 0) {
+        return res.status(400).json({ message: 'Invalid withdrawal amount' });
+    }
+
     try {
         const user = await User.findById(req.user._id);
 
-        if (user.balance < amount) {
-            return res.status(400).json({ message: 'Insufficient balance' });
+        if (isSos) {
+            // SOS WITHDRAWAL: Validate against TOTAL INVESTED (Active Investments)
+            // Calculate strictly from database to avoid sync issues
+            const activeInvestments = await Investment.find({ user: req.user._id, status: 'Active' });
+            const totalActiveInvested = activeInvestments.reduce((acc, inv) => acc + inv.amount, 0);
+
+            if (amountNum > totalActiveInvested) {
+                return res.status(400).json({ message: `Insufficient active investments for SOS. Your Active Total: $${totalActiveInvested}` });
+            }
+
+            // NOTE: For SOS, we do NOT deduct balance. 
+            // We also do not deduct totalInvested here immediately, as the Admin needs to Process/Terminate the investment manually.
+
+        } else {
+            // NORMAL WITHDRAWAL: Validate against BALANCE
+            // Strict comparison
+            if (user.balance < amountNum) {
+                return res.status(400).json({ message: 'Insufficient balance' });
+            }
+
+            // Deduct balance IMMEDIATELY for normal withdrawals
+            user.balance -= amountNum;
+            await user.save();
         }
 
         const transaction = new Transaction({
             user: req.user._id,
             type: 'Withdrawal',
-            amount,
+            amount: amountNum,
             method,
             address: address || walletAddress,
             isSos: isSos || false,
@@ -25,12 +54,6 @@ const requestWithdrawal = async (req, res) => {
         });
 
         const createdTransaction = await transaction.save();
-
-        // ------------------------------------------
-        // FIX: Deduct balance IMMEDIATELY
-        // ------------------------------------------
-        user.balance -= amount;
-        await user.save();
 
         res.status(201).json(createdTransaction);
     } catch (error) {
@@ -109,32 +132,74 @@ const updateTransaction = async (req, res) => {
             transaction.txId = txId || transaction.txId;
 
             if (status === 'Approved' && transaction.type === 'Withdrawal') {
-                // Logic: Balance was already deducted at request time.
-                // We just need to update totalWithdrawn.
-                const user = await User.findById(transaction.user);
-                if (user) {
-                    user.totalWithdrawn += transaction.amount;
-                    // user.balance -= transaction.amount; // ALREADY DEDUCTED
-                    await user.save();
+                if (Boolean(transaction.isSos) === true) {
+                    // SOS WITHDRAWAL LOGIC
+                    // 1. Deduct from Active Investments (Oldest First)
+                    // 2. Reduce User Total Invested
+                    // 3. Update Total Withdrawn
+
+                    let remainingToDeduct = Number(transaction.amount);
+
+
+                    // Find active investments, oldest first
+                    const investments = await Investment.find({
+                        user: transaction.user,
+                        status: 'Active'
+                    }).sort({ startDate: 1 });
+
+                    console.log(`[SOS Debug] Found ${investments.length} active investments for user ${transaction.user}`);
+                    console.log(`[SOS Debug] Amount to deduct: ${remainingToDeduct}`);
+
+                    for (const inv of investments) {
+                        if (remainingToDeduct <= 0) break;
+
+                        if (inv.amount <= remainingToDeduct) {
+                            // Investment fully used
+                            remainingToDeduct -= inv.amount;
+                            inv.amount = 0;
+                            inv.status = 'Terminated'; // Mark as terminated/used up
+                        } else {
+                            // Investment partially used
+                            inv.amount -= remainingToDeduct;
+                            remainingToDeduct = 0;
+                        }
+                        await inv.save();
+                    }
+
+                    // Calculate actual deducted amount (in case user didn't have enough somehow, though validated at request)
+                    const actualDeducted = Number(transaction.amount) - remainingToDeduct;
+
+                    console.log(`[SOS Debug] Actual Deducted: ${actualDeducted}, Remaining: ${remainingToDeduct}`);
+
+                    const user = await User.findById(transaction.user);
+                    if (user) {
+                        // Reduce Invested, Increase Withdrawn
+                        // Ensure we don't go below 0
+                        user.totalInvested = Math.max(0, user.totalInvested - actualDeducted);
+                        user.totalWithdrawn += transaction.amount;
+                        await user.save();
+                        console.log(`[SOS Debug] User updated. New TotalInvested: ${user.totalInvested}`);
+                    }
+                } else {
+                    // NORMAL WITHDRAWAL LOGIC
+                    // Logic: Balance was already deducted at request time.
+                    // We just need to update totalWithdrawn.
+                    const user = await User.findById(transaction.user);
+                    if (user) {
+                        user.totalWithdrawn += transaction.amount;
+                        // user.balance -= transaction.amount; // ALREADY DEDUCTED
+                        await user.save();
+                    }
                 }
             } else if (status === 'Rejected' && transaction.type === 'Withdrawal') {
                 // REFUND LOGIC
-                // If we are rejecting, we should give the money back.
-                // Check previous status to avoid double refund if rejected twice (rare but safe)
-                // Assuming we fetch fresh transaction above, transaction.status is currently OLD status?
-                // Actually req.body.status is NEW status.
-                // We haven't set transaction.status yet? 
-                // Wait, lines 106-107 set it: transaction.status = status...
-
-                // Correction: We need to know if it WAS Pending/Approved before.
-                // But for simplicity, let's assume if we are setting it to Rejected, we refund.
-                // TO be safe, only refund if it wasn't already rejected? 
-                // The simplified logic: If changing TO Rejected, refund.
-
-                const user = await User.findById(transaction.user);
-                if (user) {
-                    user.balance += transaction.amount; // REFUND
-                    await user.save();
+                // Only refund if it was NOT an SOS withdrawal (since SOS doesn't deduct balance initially)
+                if (!transaction.isSos) {
+                    const user = await User.findById(transaction.user);
+                    if (user) {
+                        user.balance += transaction.amount; // REFUND NORMAL WITHDRAWAL
+                        await user.save();
+                    }
                 }
             }
 
