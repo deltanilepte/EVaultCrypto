@@ -19,6 +19,19 @@ const Withdrawals = () => {
     const [walletAddress, setWalletAddress] = useState('');
     const [isSos, setIsSos] = useState(false);
     const [error, setError] = useState('');
+    const [viewQr, setViewQr] = useState(null);
+
+    // Pagination State
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage] = useState(8); // Slightly more since rows are smaller
+
+    // Pagination Calculation
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = withdrawals.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(withdrawals.length / itemsPerPage);
+
+    const paginate = (pageNumber) => setCurrentPage(pageNumber);
     const [success, setSuccess] = useState('');
 
     useEffect(() => {
@@ -331,14 +344,14 @@ const Withdrawals = () => {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
-                            {withdrawals.length === 0 ? (
+                            {currentItems.length === 0 ? (
                                 <tr>
                                     <td colSpan="6" className="px-8 py-12 text-center text-gray-400 text-sm">
                                         No withdrawal history found.
                                     </td>
                                 </tr>
                             ) : (
-                                withdrawals.map((w) => (
+                                currentItems.map((w) => (
                                     <tr key={w._id} className="hover:bg-gray-50/50 transition-colors">
                                         <td className="px-8 py-4 text-sm font-mono text-gray-500">#{w._id.slice(-6).toUpperCase()}</td>
                                         <td className="px-8 py-4 text-sm text-gray-600">{new Date(w.date || w.createdAt).toLocaleDateString()}</td>
@@ -371,6 +384,35 @@ const Withdrawals = () => {
                         </tbody>
                     </table>
                 </div>
+
+                {/* Pagination Controls */}
+                {withdrawals.length > itemsPerPage && (
+                    <div className="px-8 py-4 border-t border-gray-100 flex items-center justify-between bg-gray-50/50">
+                        <button
+                            onClick={() => paginate(Math.max(1, currentPage - 1))}
+                            disabled={currentPage === 1}
+                            className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${currentPage === 1
+                                ? 'text-gray-400 cursor-not-allowed'
+                                : 'text-gray-700 hover:bg-gray-200'
+                                }`}
+                        >
+                            Previous
+                        </button>
+                        <span className="text-sm text-gray-600 font-medium">
+                            Page <span className="text-gray-900">{currentPage}</span> of <span className="text-gray-900">{totalPages}</span>
+                        </span>
+                        <button
+                            onClick={() => paginate(Math.min(totalPages, currentPage + 1))}
+                            disabled={currentPage === totalPages}
+                            className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${currentPage === totalPages
+                                ? 'text-gray-400 cursor-not-allowed'
+                                : 'text-gray-700 hover:bg-gray-200'
+                                }`}
+                        >
+                            Next
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
     );

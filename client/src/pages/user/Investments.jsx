@@ -25,6 +25,18 @@ const Investments = () => {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
 
+    // Pagination State
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage] = useState(5);
+
+    // Pagination Calculation
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = investments.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(investments.length / itemsPerPage);
+
+    const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
     const handleClaim = async (id) => {
         const res = await claimROI(id);
         if (res.success) {
@@ -510,7 +522,7 @@ const Investments = () => {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
-                                {investments.length === 0 ? (
+                                {currentItems.length === 0 ? (
                                     <tr>
                                         <td colSpan="7" className="px-8 py-16 text-center">
                                             <div className="flex flex-col items-center justify-center text-gray-400">
@@ -521,7 +533,7 @@ const Investments = () => {
                                         </td>
                                     </tr>
                                 ) : (
-                                    investments.map((inv) => {
+                                    currentItems.map((inv) => {
                                         const lastClaim = new Date(inv.lastClaimedAt).getTime();
                                         const periodDays = inv.roiPeriod === 'Daily' ? 1 : 30;
                                         const periodMs = periodDays * 24 * 60 * 60 * 1000;
@@ -599,6 +611,35 @@ const Investments = () => {
                             </tbody>
                         </table>
                     </div>
+
+                    {/* Pagination Controls */}
+                    {investments.length > itemsPerPage && (
+                        <div className="px-8 py-4 border-t border-gray-100 flex items-center justify-between bg-gray-50/50">
+                            <button
+                                onClick={() => paginate(Math.max(1, currentPage - 1))}
+                                disabled={currentPage === 1}
+                                className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${currentPage === 1
+                                    ? 'text-gray-400 cursor-not-allowed'
+                                    : 'text-gray-700 hover:bg-gray-200'
+                                    }`}
+                            >
+                                Previous
+                            </button>
+                            <span className="text-sm text-gray-600 font-medium">
+                                Page <span className="text-gray-900">{currentPage}</span> of <span className="text-gray-900">{totalPages}</span>
+                            </span>
+                            <button
+                                onClick={() => paginate(Math.min(totalPages, currentPage + 1))}
+                                disabled={currentPage === totalPages}
+                                className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${currentPage === totalPages
+                                    ? 'text-gray-400 cursor-not-allowed'
+                                    : 'text-gray-700 hover:bg-gray-200'
+                                    }`}
+                            >
+                                Next
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div >
         </div >

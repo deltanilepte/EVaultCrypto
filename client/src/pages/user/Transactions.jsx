@@ -1,9 +1,21 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useCrypto } from '../../context/CryptoContext';
 import { ArrowDownTrayIcon, ArrowUpTrayIcon } from '@heroicons/react/24/outline'; // Example icons
 
 const Transactions = () => {
     const { investments } = useCrypto();
+
+    // Pagination State
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage] = useState(8);
+
+    // Pagination Calculation
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = investments.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(investments.length / itemsPerPage);
+
+    const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
     return (
         <div className="space-y-6">
@@ -29,7 +41,7 @@ const Transactions = () => {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
-                            {investments.map((inv) => (
+                            {currentItems.map((inv) => (
                                 <tr key={inv._id} className="hover:bg-gray-50/50 transition-colors group">
                                     <td className="px-8 py-4">
                                         <span className="font-mono text-xs text-gray-500 group-hover:text-[#D4AF37] transition-colors">
@@ -71,6 +83,35 @@ const Transactions = () => {
                         </tbody>
                     </table>
                 </div>
+
+                {/* Pagination Controls */}
+                {investments.length > itemsPerPage && (
+                    <div className="px-8 py-4 border-t border-gray-100 flex items-center justify-between bg-gray-50/50">
+                        <button
+                            onClick={() => paginate(Math.max(1, currentPage - 1))}
+                            disabled={currentPage === 1}
+                            className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${currentPage === 1
+                                ? 'text-gray-400 cursor-not-allowed'
+                                : 'text-gray-700 hover:bg-gray-200'
+                                }`}
+                        >
+                            Previous
+                        </button>
+                        <span className="text-sm text-gray-600 font-medium">
+                            Page <span className="text-gray-900">{currentPage}</span> of <span className="text-gray-900">{totalPages}</span>
+                        </span>
+                        <button
+                            onClick={() => paginate(Math.min(totalPages, currentPage + 1))}
+                            disabled={currentPage === totalPages}
+                            className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${currentPage === totalPages
+                                ? 'text-gray-400 cursor-not-allowed'
+                                : 'text-gray-700 hover:bg-gray-200'
+                                }`}
+                        >
+                            Next
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
     );
