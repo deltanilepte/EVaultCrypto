@@ -14,7 +14,19 @@ dotenv.config();
 
 // CORS
 const corsOptions = {
-    origin: ['http://localhost:5173', 'http://localhost:5174', 'https://e-vault-crypto.vercel.app', 'https://e-vault-crypto-backend.vercel.app', 'https://e-vault-crypto-backend.vercel.app/api', 'http://localhost:5000', 'https://e-vault-crypto-frontend.vercel.app', 'https://e-vault-crypto-backend-five.vercel.app/api'], // Allow both 5173 and 5174
+    origin: [
+        'http://localhost:5173',
+        'http://localhost:5174',
+        'https://e-vault-crypto.vercel.app',
+        'https://e-vault-crypto-backend.vercel.app',
+        'https://e-vault-crypto-backend.vercel.app/api',
+        'http://localhost:5000',
+        'https://e-vault-crypto-frontend.vercel.app',
+        'https://e-vault-crypto-backend-five.vercel.app/api',
+        'https://www.evaultcryptobank.com',
+        'https://evaultcryptobank.com',
+        process.env.CLIENT_URL
+    ].filter(Boolean), // Filter out undefined if env var is missing
     methods: 'GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH, PROPFIND',
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true

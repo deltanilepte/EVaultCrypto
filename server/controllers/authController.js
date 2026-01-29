@@ -46,7 +46,7 @@ const registerUser = async (req, res) => {
 
         if (user) {
             // Create verification url
-            const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+            const clientUrl = process.env.CLIENT_URL || 'https://e-vault-crypto-frontend.vercel.app';
             const verifyUrl = `${clientUrl}/verify-email/${verificationToken}`;
 
             const message = `
