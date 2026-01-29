@@ -472,7 +472,11 @@ const Investments = () => {
                                     </div>
                                     <div className="flex justify-between items-end border-b border-gray-800 pb-4">
                                         <span className="text-gray-400 text-sm">Est. Profit</span>
-                                        <span className="text-xl font-mono text-[#D4AF37]">+${projectedReturn}</span>
+                                        <span className="text-xl font-mono text-[#D4AF37]">
+                                            +${(selectedMethod === 'USDT'
+                                                ? (parseFloat(projectedReturn || 0) - parseFloat(amount || 0))
+                                                : parseFloat(projectedReturn || 0)).toFixed(2)}
+                                        </span>
                                     </div>
 
                                     <div className="pt-4 pb-2">
@@ -482,7 +486,9 @@ const Investments = () => {
                                         </div>
                                         <div className="text-right">
                                             <span className="text-4xl font-bold block text-white tracking-tight">
-                                                ${(parseFloat(amount || 0) + parseFloat(projectedReturn || 0)).toFixed(2)}
+                                                ${(selectedMethod === 'USDT'
+                                                    ? parseFloat(projectedReturn || 0)
+                                                    : (parseFloat(amount || 0) + parseFloat(projectedReturn || 0))).toFixed(2)}
                                             </span>
                                         </div>
                                     </div>
