@@ -88,7 +88,7 @@ const Register = () => {
                         <div className="text-center mb-6 shrink-0">
                             <div className="flex justify-center mb-4">
                                 <div className="p-2 bg-navy/5 rounded-2xl">
-                                    <img src={eVault_Logo} alt="eVault Logo" className="h-10 object-contain" />
+                                    <img src={eVault_Logo} alt="eVault Logo" className="h-30! w-30! object-contain" />
                                 </div>
                             </div>
                             <h1 className="text-2xl font-black text-navy tracking-tight mb-1">Create Account</h1>

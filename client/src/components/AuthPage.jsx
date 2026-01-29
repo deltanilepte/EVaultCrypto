@@ -224,7 +224,7 @@ const SignUpForm = ({ toggleMode }) => {
             <div className="text-center mb-6">
                 {/* Mobile Logo */}
                 <div className="md:hidden flex justify-center mb-6">
-                    <img src={eVault_Logo} alt="Logo" className="h-12 object-contain" />
+                    <img src={eVault_Logo} alt="Logo" className="h-36 object-contain" />
                 </div>
 
                 <h2 className="text-4xl font-bold text-[#0F172A] tracking-tight mb-8">Create Account</h2>
