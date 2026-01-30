@@ -108,7 +108,7 @@ const NewsletterManagement = () => {
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {formatDate(sub.date || sub.createdAt)}
+                                            {formatDate(sub.subscribedAt)}
                                         </td>
                                         {/* <td className="px-6 py-4 whitespace-nowrap text-right">
                                             <button className="text-red-500 hover:text-red-700 transition-colors">

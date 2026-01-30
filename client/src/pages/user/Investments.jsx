@@ -9,7 +9,9 @@ import {
     ChartBarIcon,
     CheckCircleIcon,
     ExclamationCircleIcon,
-    ArrowTrendingUpIcon
+    ArrowTrendingUpIcon,
+    ClipboardDocumentIcon,
+    CheckIcon
 } from '@heroicons/react/24/outline';
 
 const Investments = () => {
@@ -24,6 +26,7 @@ const Investments = () => {
     const [duration, setDuration] = useState('30 Days');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+    const [isCopied, setIsCopied] = useState(false);
 
     // Pagination State
     const [currentPage, setCurrentPage] = useState(1);
@@ -136,6 +139,14 @@ const Investments = () => {
         setReceiverWalletAddress('');
 
     }, [selectedMethod, investments, roiRates, network]);
+
+    const handleCopyWallet = () => {
+        if (receiverWalletAddress) {
+            navigator.clipboard.writeText(receiverWalletAddress);
+            setIsCopied(true);
+            setTimeout(() => setIsCopied(false), 2000);
+        }
+    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -330,8 +341,21 @@ const Investments = () => {
                                                     readOnly
                                                     value={receiverWalletAddress}
                                                     placeholder="Address will auto-populate..."
-                                                    className="block w-full pl-10 pr-4 py-3.5 border border-gray-200 rounded-xl bg-gray-100 text-gray-500 cursor-not-allowed focus:ring-0 focus:border-gray-200 transaction-all"
+                                                    className="block w-full pl-10 pr-12 py-3.5 border border-gray-200 rounded-xl bg-gray-100 text-gray-500 cursor-text focus:ring-0 focus:border-gray-200 transaction-all"
                                                 />
+                                                <button
+                                                    type="button"
+                                                    onClick={handleCopyWallet}
+                                                    disabled={!receiverWalletAddress}
+                                                    className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer hover:text-[#D4AF37] disabled:cursor-not-allowed disabled:hover:text-gray-400 transition-colors"
+                                                    title="Copy Address"
+                                                >
+                                                    {isCopied ? (
+                                                        <CheckIcon className="h-5 w-5 text-green-500" />
+                                                    ) : (
+                                                        <ClipboardDocumentIcon className="h-5 w-5 text-gray-400" />
+                                                    )}
+                                                </button>
                                             </div>
                                             <p className="text-xs text-gray-500">Scan this code to send payment directly to the receiver wallet.</p>
                                         </div>
@@ -394,7 +418,7 @@ const Investments = () => {
                                         <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Monthly</p>
                                         <p className="text-lg font-bold text-gray-700">
                                             {(roiRates[selectedMethod].period === 'Daily'
-                                                ? (roiRates[selectedMethod].rate * 30)
+                                                ? (roiRates[selectedMethod].rate * 30 - 100)
                                                 : roiRates[selectedMethod].rate).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}%
                                         </p>
                                     </div>
@@ -402,7 +426,7 @@ const Investments = () => {
                                         <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Quarterly</p>
                                         <p className="text-lg font-bold text-gray-700">
                                             {(roiRates[selectedMethod].period === 'Daily'
-                                                ? (roiRates[selectedMethod].rate * 90)
+                                                ? (roiRates[selectedMethod].rate * 90 - 300)
                                                 : (roiRates[selectedMethod].rate * 3)).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}%
                                         </p>
                                     </div>
@@ -410,7 +434,7 @@ const Investments = () => {
                                         <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Half Yearly</p>
                                         <p className="text-lg font-bold text-gray-700">
                                             {(roiRates[selectedMethod].period === 'Daily'
-                                                ? (roiRates[selectedMethod].rate * 180)
+                                                ? (roiRates[selectedMethod].rate * 180 - 600)
                                                 : (roiRates[selectedMethod].rate * 6)).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}%
                                         </p>
                                     </div>
@@ -418,7 +442,7 @@ const Investments = () => {
                                         <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Yearly</p>
                                         <p className="text-lg font-bold text-gray-700">
                                             {(roiRates[selectedMethod].period === 'Daily'
-                                                ? (roiRates[selectedMethod].rate * 365)
+                                                ? (roiRates[selectedMethod].rate * 365 - 1200)
                                                 : (roiRates[selectedMethod].rate * 12)).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}%
                                         </p>
                                     </div>

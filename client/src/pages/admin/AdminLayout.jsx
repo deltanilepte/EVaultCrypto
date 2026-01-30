@@ -11,16 +11,21 @@ import {
     ChevronRightIcon,
     ShieldCheckIcon,
     ArrowRightOnRectangleIcon,
-    EnvelopeIcon
+    EnvelopeIcon,
+    BellIcon,
+    InformationCircleIcon
 } from '@heroicons/react/24/outline';
 const eVault_Logo = '/evaultbg.png';
-
+import api from '../../api/axios';
 import { useCrypto } from '../../context/CryptoContext';
 
 const AdminLayout = () => {
     const { user, loading, allUsers, logout } = useCrypto();
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [collapsed, setCollapsed] = useState(false);
+    const [notifications, setNotifications] = useState([]);
+    const [showNotifications, setShowNotifications] = useState(false);
+    const [unreadCount, setUnreadCount] = useState(0);
     const location = useLocation();
     const navigate = useNavigate();
 
@@ -34,6 +39,37 @@ const AdminLayout = () => {
             }
         }
     }, [user, loading, navigate]);
+
+    const [lastViewedTime, setLastViewedTime] = useState(
+        localStorage.getItem('adminLastViewedNotifications') || null
+    );
+
+    // Fetch Notifications
+    React.useEffect(() => {
+        if (user?.isAdmin) {
+            fetchNotifications();
+            // Poll every 30 seconds
+            const interval = setInterval(fetchNotifications, 30000);
+            return () => clearInterval(interval);
+        }
+    }, [user, lastViewedTime]);
+
+    const fetchNotifications = async () => {
+        try {
+            const { data } = await api.get('/admin/notifications');
+            setNotifications(data);
+
+            // Calculate unread count based on last viewed time
+            if (!lastViewedTime) {
+                setUnreadCount(data.length);
+            } else {
+                const newItems = data.filter(item => new Date(item.date) > new Date(lastViewedTime));
+                setUnreadCount(newItems.length);
+            }
+        } catch (error) {
+            console.error("Failed to fetch notifications");
+        }
+    };
 
     if (loading) {
         return (
@@ -215,6 +251,87 @@ const AdminLayout = () => {
                             </div>
                         </div>
 
+                        {/* Notification Bell */}
+                        <div className="relative">
+                            <button
+                                onClick={() => {
+                                    setShowNotifications(!showNotifications);
+                                    if (!showNotifications) {
+                                        const now = new Date().toISOString();
+                                        localStorage.setItem('adminLastViewedNotifications', now);
+                                        setLastViewedTime(now);
+                                        setUnreadCount(0);
+                                    }
+                                }}
+                                className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-[#D4AF37] transition-colors relative"
+                            >
+                                <BellIcon className="w-6 h-6" />
+                                {unreadCount > 0 && (
+                                    <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white border-2 border-white">
+                                        {unreadCount > 9 ? '9+' : unreadCount}
+                                    </span>
+                                )}
+                            </button>
+
+                            {/* Notification Dropdown */}
+                            {showNotifications && (
+                                <>
+                                    <div
+                                        className="fixed inset-0 z-40"
+                                        onClick={() => setShowNotifications(false)}
+                                    ></div>
+                                    <div className="absolute right-0 mt-3 w-80 bg-white rounded-2xl shadow-xl border border-gray-100 z-50 overflow-hidden transform transition-all animate-fade-in-up">
+                                        <div className="p-4 border-b border-gray-50 bg-gray-50/50 flex justify-between items-center">
+                                            <h3 className="font-bold text-gray-900">Notifications</h3>
+                                            <span className="text-xs font-medium text-[#D4AF37] bg-[#D4AF37]/10 px-2 py-1 rounded-full">
+                                                Recent Activity
+                                            </span>
+                                        </div>
+                                        <div className="max-h-96 overflow-y-auto">
+                                            {notifications.length === 0 ? (
+                                                <div className="p-8 text-center text-gray-500">
+                                                    <InformationCircleIcon className="w-8 h-8 mx-auto mb-2 text-gray-300" />
+                                                    <p className="text-sm">No recent activity</p>
+                                                </div>
+                                            ) : (
+                                                <div className="divide-y divide-gray-50">
+                                                    {notifications.map((item, index) => (
+                                                        <Link
+                                                            key={index}
+                                                            to={item.link}
+                                                            onClick={() => setShowNotifications(false)}
+                                                            className="block p-4 hover:bg-gray-50 transition-colors group"
+                                                        >
+                                                            <div className="flex gap-3">
+                                                                <div className={`mt-1 p-2 rounded-lg shrink-0 ${item.type === 'User' ? 'bg-blue-50 text-blue-600' :
+                                                                    item.type === 'Investment' ? 'bg-green-50 text-green-600' :
+                                                                        item.type === 'Withdrawal' ? 'bg-red-50 text-red-600' :
+                                                                            'bg-purple-50 text-purple-600'
+                                                                    }`}>
+                                                                    {item.type === 'User' && <UsersIcon className="w-4 h-4" />}
+                                                                    {item.type === 'Investment' && <BanknotesIcon className="w-4 h-4" />}
+                                                                    {item.type === 'Withdrawal' && <DocumentCheckIcon className="w-4 h-4" />}
+                                                                    {item.type === 'Newsletter' && <EnvelopeIcon className="w-4 h-4" />}
+                                                                </div>
+                                                                <div>
+                                                                    <p className="text-sm text-gray-800 font-medium group-hover:text-[#D4AF37] transition-colors line-clamp-2">
+                                                                        {item.message}
+                                                                    </p>
+                                                                    <p className="text-xs text-gray-400 mt-1">
+                                                                        {new Date(item.date).toLocaleString()}
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                        </Link>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </>
+                            )}
+                        </div>
+
                         {/* User Profile */}
                         <div className="flex items-center space-x-3">
                             <div className="text-right hidden md:block">
@@ -248,8 +365,8 @@ const AdminLayout = () => {
                         </div>
                     </div>
                 </main>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 };
 

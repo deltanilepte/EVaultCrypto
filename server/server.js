@@ -4,6 +4,7 @@ const cors = require('cors');
 const connectDB = require('./config/db.js');
 // Routes
 const authRoutes = require('./routes/auth');
+const adminRoutes = require('./routes/adminRoutes');
 const investmentRoutes = require('./routes/investment');
 const transactionRoutes = require('./routes/transaction');
 const configRoutes = require('./routes/config');
@@ -54,6 +55,7 @@ app.use((req, res, next) => {
 
 // Routes usage
 app.use('/api/auth', authRoutes);
+app.use('/api/admin', adminRoutes);
 app.use('/api/investments', investmentRoutes);
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/config', configRoutes);
